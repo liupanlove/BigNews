@@ -28,4 +28,10 @@
         <item name="android:duplicateParentState">true</item>
     </style>
 
+    <style name="MainBottomImageButton">
+        <item name="android:layout_width">30dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:clickable">false</item>
+        <item name="android:duplicateParentState">true</item>
+    </style>
 </resources>
