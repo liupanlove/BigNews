@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.Toolbar
+        android:id = "@+id/toolbar"
+        android:layout_width = "match_parent"
+        android:layout_height = "wrap_content"
+        android:background="?attr/colorPrimary"
+        android:alpha="0.8">
+        <TextView
+            android:layout_width = "80dp"
+            android:layout_height = "wrap_content"
+            android:text = "大新闻"
+            android:textSize = "20dp"/>
+        <SearchView
+            android:id = "@+id/searchview"
+            android:layout_width="280dp"
+            android:layout_height="40dp"
+            app:queryHint="请输入搜索内容"
+            android:background="@color/white"
+            />
+    </android.support.v7.widget.Toolbar>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:id = "@+id/content_layout"/>
+    <LinearLayout
+        android:id="@+id/layout_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true">      <!--默认 hori -->
+
+        <LinearLayout
+            android:id="@+id/layout_news"
+            style="@style/MainBottomLayout">
+
+            <ImageButton
+                style="@style/MainBottomImageButton"
+                android:background="@drawable/home"/>
+
+            <TextView
+                style="@style/MainBottomTextView"
+                android:enabled="false"
+                android:text="新闻" />
+        </LinearLayout>
+        <LinearLayout
+            android:id = "@+id/layout_settings"
+            style="@style/MainBottomLayout">
+
+            <ImageButton
+                style="@style/MainBottomImageButton"
+                android:background="@drawable/settings"/>
+
+            <TextView
+                style="@style/MainBottomTextView"
+                android:enabled="false"
+                android:text="设置" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
