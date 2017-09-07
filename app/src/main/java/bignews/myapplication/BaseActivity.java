@@ -1,4 +1,5 @@
 package bignews.myapplication;
+import android.support.v7.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -11,7 +12,7 @@ import android.widget.LinearLayout;
  * Created by guoye on 2017/9/7.
  */
 
-public class BaseActivity extends Activity {
+public class BaseActivity extends AppCompatActivity {
     private LinearLayout contentLayout;
 
     @Override
