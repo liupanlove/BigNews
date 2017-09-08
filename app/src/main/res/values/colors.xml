@@ -7,4 +7,5 @@
     <color name="red">#ff0000</color>
     <color name="white">#ffffff</color> <!-- 白色 -->
     <color name="translucent">#e0000000</color>  <!-- 半透明 -->
+    <color name="gray">#BFBFBF</color>
 </resources>

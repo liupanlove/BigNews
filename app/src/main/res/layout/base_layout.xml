@@ -12,7 +12,7 @@
         android:background="?attr/colorPrimary"
         android:alpha="0.8">
         <TextView
-            android:layout_width = "80dp"
+            android:layout_width =  "80dp"
             android:layout_height = "wrap_content"
             android:text = "大新闻"
             android:textSize = "20dp"/>
@@ -29,12 +29,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_weight="1"
-        android:id = "@+id/content_layout"/>
+        android:id = "@+id/content_layout"/>con
     <LinearLayout
         android:id="@+id/layout_bottom"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_alignParentBottom="true">      <!--默认 hori -->
+        android:layout_alignParentBottom="true">      <!--表示在容器底部 -->
 
         <LinearLayout
             android:id="@+id/layout_news"
