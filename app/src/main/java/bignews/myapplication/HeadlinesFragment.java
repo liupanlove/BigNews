@@ -75,6 +75,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
     @Override
     public void onCreate(@Nullable Bundle bundle) {
+        Log.i(TAG, "onCreate: "+mText);
         super.onCreate(bundle);
         if(getArguments()!=null){
             mText = getArguments().getString("text");
@@ -84,6 +85,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.i(TAG, "onCreateView: "+mText);
         View view = inflater.inflate(R.layout.fragment_layout, container, false);
         ButterKnife.bind(this, view); //??? mogai
         listView.setMode(PullToRefreshBase.Mode.PULL_FROM_END);
@@ -114,8 +116,6 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         adapter = new ArrayAdapter<String>(getActivity(), layout, news);
         listView.setAdapter(adapter);
         loadNewsData();
-        adapter.notifyDataSetChanged();
-        listView.onRefreshComplete();
     }
 
     private void loadNewsData() {
@@ -130,16 +130,18 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
             @Override
             public void onSuccess(@NonNull ArrayList<String> strings) {
-                Log.i(TAG, "onSuccess: loadNewsDatasuccess");
                 news = strings;
+                Log.i(TAG, "onSuccess: loadNewsDatasuccess "+news);
+                adapter.clear();
+                adapter.addAll(news);
                 adapter.notifyDataSetChanged();
                 listView.onRefreshComplete();
+
             }
 
             @Override
             public void onError(@NonNull Throwable e) {
                 Log.i(TAG, "onError: timeout");
-                adapter.notifyDataSetChanged();
                 listView.onRefreshComplete();
                 d.dispose();
             }
