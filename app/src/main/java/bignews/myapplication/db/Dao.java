@@ -37,8 +37,8 @@ public class Dao {
     public synchronized ArrayList<String> getNewsList(DaoParameter param)
     {
         cnt += 1;
-        if (cnt % 1000 == 0) try {
-            Thread.sleep(5000);
+        if (cnt % 5 == 0) try {
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

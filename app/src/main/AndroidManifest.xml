@@ -19,6 +19,7 @@
         <activity android:name=".MainActivity"></activity>
         <activity android:name=".ArticleFragment" ></activity>
         <activity android:name=".SearchActivity"></activity>
+        <activity android:name=".ConfigActivity" ></activity>
 
     </application>
 
