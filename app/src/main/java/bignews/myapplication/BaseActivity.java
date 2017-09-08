@@ -1,8 +1,10 @@
 package bignews.myapplication;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,11 +16,28 @@ import android.widget.LinearLayout;
 
 public class BaseActivity extends AppCompatActivity {
     private LinearLayout contentLayout;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initContentView(R.layout.base_layout);
+
+        searchView = (SearchView) findViewById(R.id.searchview);
+        searchView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void  onClick(View view)
+            {
+                openSearchActivity();
+            }
+        });
+    }
+
+    private void openSearchActivity()
+    {
+        Intent intent = new Intent(this, SearchActivity.class);
+        startActivity(intent);
     }
     private void initContentView(int layoutResID) {
         super.setContentView(layoutResID);
