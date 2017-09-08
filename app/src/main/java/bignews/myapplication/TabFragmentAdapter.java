@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 public class TabFragmentAdapter extends FragmentPagerAdapter {
 
+    private static final String TAG = "TabFragmentAdapter";
     private final String[] titles;
     private Context context;
     private List<Fragment> fragments;
@@ -23,7 +25,13 @@ public class TabFragmentAdapter extends FragmentPagerAdapter {
         this.fragments = fragments;
         this.titles = titles;
     }
-
+    @Override
+    public void notifyDataSetChanged() {
+        Log.i(TAG, "notifyDataSetChanged: ");
+        // 重写这个方法，取到子Fragment的数量，用于下面的判断，以执行多少次刷新
+        //mChildCount = getCount();
+        super.notifyDataSetChanged();
+    }
 
     @Override
     public Fragment getItem(int position) {
