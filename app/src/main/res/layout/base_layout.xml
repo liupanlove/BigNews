@@ -55,6 +55,7 @@
 
             <ImageButton
                 style="@style/MainBottomImageButton"
+                android:id="@+id/config_botton"
                 android:background="@drawable/settings"/>
 
             <TextView
