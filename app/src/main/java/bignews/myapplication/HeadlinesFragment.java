@@ -54,7 +54,29 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     private List<String/*NewsBean*/> news = new ArrayList<>();
     OnHeadlineSelectedListener mCallback;
     private ArrayAdapter<String> adapter;
-    private SingleObserver<? super ArrayList<String>> subscriber;
+    private SingleObserver<? super ArrayList<String>> subscriber = new SingleObserver<ArrayList<String>>() {
+        @Override
+        public void onSubscribe(@NonNull Disposable d) {
+            disposable = d;
+        }
+
+        @Override
+        public void onSuccess(@NonNull ArrayList<String> strings) {
+            news = strings;
+            Log.i(TAG, "onSuccess: loadNewsDatasuccess "+mText+" "+news);
+            adapter.clear();
+            adapter.addAll(news);
+            adapter.notifyDataSetChanged();
+            listView.onRefreshComplete();
+        }
+
+        @Override
+        public void onError(@NonNull Throwable e) {
+            Log.i(TAG, "onError: timeout");
+            listView.onRefreshComplete();
+        }
+    };
+    private Disposable disposable;
 
     public interface OnHeadlineSelectedListener {
         /** Called by HeadlinesFragment when a list item is selected */
@@ -88,6 +110,14 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         Log.i(TAG, "onCreateView: "+mText);
         View view = inflater.inflate(R.layout.fragment_layout, container, false);
         ButterKnife.bind(this, view); //??? mogai
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        Log.i(TAG, "onResume: "+mText);
+        super.onResume();
+
         listView.setMode(PullToRefreshBase.Mode.PULL_FROM_END);
         // 下拉刷新
         //listView.getLoadingLayoutProxy(true, false).setPullLabel("下拉刷新");
@@ -104,12 +134,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
                 loadNewsData();
             }
         });
-        return view;
-    }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Log.i(TAG, "onViewCreated: "+mText);
         listView.setOnItemClickListener(this);
         int layout = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ?
                 android.R.layout.simple_list_item_activated_1 : android.R.layout.simple_list_item_1;
@@ -118,51 +143,33 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         loadNewsData();
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Log.i(TAG, "onViewCreated: "+mText);
+        super.onViewCreated(view, savedInstanceState);
+    }
+
     private void loadNewsData() {
         final DaoParameter param = new DaoParameter(mText);
         //news = dao.getNewsList(param);
-        subscriber = new SingleObserver<ArrayList<String>>() {
-            Disposable d;
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {
-                this.d = d;
-            }
-
-            @Override
-            public void onSuccess(@NonNull ArrayList<String> strings) {
-                news = strings;
-                Log.i(TAG, "onSuccess: loadNewsDatasuccess "+news);
-                adapter.clear();
-                adapter.addAll(news);
-                adapter.notifyDataSetChanged();
-                listView.onRefreshComplete();
-
-            }
-
-            @Override
-            public void onError(@NonNull Throwable e) {
-                Log.i(TAG, "onError: timeout");
-                listView.onRefreshComplete();
-                d.dispose();
-            }
-        };
         Single.create(new SingleOnSubscribe<ArrayList<String>>() {
             @Override
             public void subscribe(@NonNull SingleEmitter<ArrayList<String>> e) throws Exception {
                 e.onSuccess(dao.getNewsList(param));
             }
-        }).timeout(1, TimeUnit.SECONDS)
+        }).timeout(3, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(subscriber);
         Log.i(TAG, "loadNewsData: "+news+" "+mText);
 
     }
-    /*@Override
+    @Override
     public void onPause() {
         super.onPause();
-        if (subscriber != null) {
-            subscriber.unsubscribe();
+        if (disposable != null) {
+            Log.i(TAG, "onPause: " + mText + " Disposing.");
+            disposable.dispose();
         }
-    }*/
+    }
 }
