@@ -22,6 +22,10 @@ public class DaoParam {
      * that is previously loaded.
      */
     public int offset;
+    /**
+     * limit of the data
+     */
+    public int limit;
     public static class MODE {
         public static final int TEXT = 1;
         public static final int IMAGE = 0;
@@ -38,9 +42,11 @@ public class DaoParam {
 
     public DaoParam() {}
 
-    public static DaoParam fromCategory(int category) {
+    public static DaoParam fromCategory(int category, int offset, int limit) {
         DaoParam dp = new DaoParam();
         dp.category = category;
+        dp.offset = offset;
+        dp.limit = limit;
         return dp;
     }
 

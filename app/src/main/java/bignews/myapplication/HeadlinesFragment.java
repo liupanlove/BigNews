@@ -40,6 +40,7 @@ import io.reactivex.schedulers.Schedulers;
 public class HeadlinesFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     private static final String TAG = "HeadlinesFragment";
+    private static final int LIMIT = 5;
     Dao dao = Dao.getInstance(); //should be a singleton.
 
     private String mText;
@@ -58,12 +59,12 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
         @Override
         public void onSuccess(@NonNull ArrayList<HeadLine> strings) {
-            news = strings;
-            Log.i(TAG, "onSuccess: loadNewsDatasuccess "+mText+" "+news);
-            adapter.clear();
-            adapter.addAll(news);
+            //news.addAll(strings);
+            //adapter.clear();
+            adapter.addAll(strings);
             adapter.notifyDataSetChanged();
             listView.onRefreshComplete();
+            Log.i(TAG, "onSuccess: loadNewsDatasuccess "+mText+" "+news);
         }
 
         @Override
@@ -146,7 +147,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     }
 
     private void loadNewsData() {
-        final DaoParam param = DaoParam.fromCategory(Integer.parseInt(mText));
+        final DaoParam param = DaoParam.fromCategory(Integer.parseInt(mText), news.size(), LIMIT);
         //news = dao.getNewsList(param);
         Single.create(new SingleOnSubscribe<ArrayList<HeadLine>>() {
             @Override

@@ -80,7 +80,7 @@ public class Dao {
                     @Override
                     public ArrayList<HeadLine> apply(@NonNull ArrayList<HeadLine> headLines) throws Exception {
 
-                        for (int i = 0; i < 5; ++i) {
+                        for (int i = param.offset; i < param.offset + param.limit; ++i) {
                             HeadLine headline = new HeadLine();
                             headline.newsTitle = "title:" + i;
                             headline.newsClass = param.category + "";
