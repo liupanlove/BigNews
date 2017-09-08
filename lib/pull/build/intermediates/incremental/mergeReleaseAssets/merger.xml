@@ -1,2 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="/Users/lazycal/workspace/course/2.3/java/big_project/BigNews/lib/pull/assets"/><source path="/Users/lazycal/workspace/course/2.3/java/big_project/BigNews/lib/pull/build/generated/assets/shaders/release"/></dataSet><dataSet config="release"><source path="/Users/lazycal/workspace/course/2.3/java/big_project/BigNews/lib/pull/src/release/assets"/></dataSet></merger>
