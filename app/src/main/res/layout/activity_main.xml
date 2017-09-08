@@ -3,16 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
-
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#D33C3C"
+        android:background= "@color/colorPrimary"
+        android:alpha="0.8"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal">   <!--"@color/colorPrimary"-->
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tablayout"
@@ -23,11 +22,16 @@
             app:tabMode="scrollable">
         </android.support.design.widget.TabLayout>
 
-        <ImageView
-            android:layout_width="wrap_content"
+        <FrameLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
-            android:src="@drawable/settings"/>
+            android:layout_weight="0.08"
+            android:layout_marginRight="8dp">  <!--没什么卵用 -->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/plus"/>
+        </FrameLayout>
     </LinearLayout>
 
 
@@ -35,5 +39,7 @@
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"></android.support.v4.view.ViewPager>
+        android:layout_weight="1">
+
+    </android.support.v4.view.ViewPager>
 </LinearLayout>

@@ -23,7 +23,7 @@ public class MainActivity extends BaseActivity
     private static final String TAG = "MainActivity";
     private String titles[];
     {
-        titles = new String[]{"1", "2", "3"};
+        titles = new String[]{"1", "2", "3", "4", "5", "6", "7"};
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
