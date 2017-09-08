@@ -1,10 +1,10 @@
 package bignews.myapplication.db;
 
-import android.util.Log;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.SynchronousQueue;
+
+import io.reactivex.Single;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Function;
 
 /**
  * Created by lazycal on 2017/9/7.
@@ -26,16 +26,44 @@ public class Dao {
     private static Dao dao;
 
     private Dao() {}
+
+    /**
+     * Return a singleton.
+     * @return the instance of Dao
+     */
     public synchronized static Dao getInstance() {
         if (dao == null) dao = new Dao();
         return dao;
     }
-    public String getNews(DaoParameter param)
+
+    /**
+     * Get news body.
+     * @param param parameter
+     * @return The news body
+     */
+    public News getNews(final DaoParam param)
     {
-        return Articles[param.id];
+        return Single.just(new News())
+                .map(new Function<News, News>() {
+                    @Override
+                    public News apply(@NonNull News news) throws Exception {
+                        news.newsTitle = ""+param.newsID;
+                        return news;
+                    }
+                })
+                .blockingGet();
     }
-    public synchronized ArrayList<String> getNewsList(DaoParameter param)
+
+    /**
+     * Get headline list.
+     * User can specify @link{DaoParam#category}, @link{DaoParam#keywords}, @link{DaoParam#mode}
+     * and so on.
+     * @param param parameter
+     * @return An ArrayList containing the headlines
+     */
+    public ArrayList<HeadLine> getNewsList(final DaoParam param)
     {
+        /*
         cnt += 1;
         if (cnt % 5 == 0) try {
             Thread.sleep(2000);
@@ -46,5 +74,41 @@ public class Dao {
         Headlines.add(String.valueOf(cnt));
         Log.i(TAG, "getNewsList: After: "+Headlines);
         return (ArrayList<String>) Headlines.clone();
+        */
+        return Single.just(new ArrayList<HeadLine>())
+                .map(new Function<ArrayList<HeadLine>, ArrayList<HeadLine>>() {
+                    @Override
+                    public ArrayList<HeadLine> apply(@NonNull ArrayList<HeadLine> headLines) throws Exception {
+
+                        for (int i = 0; i < 5; ++i) {
+                            HeadLine headline = new HeadLine();
+                            headline.newsTitle = "title:" + i;
+                            headline.newsClass = param.category + "";
+                            headline.newsID = i + "";
+                            headLines.add(headline);
+                        }
+                        return headLines;
+                    }
+                })
+                .blockingGet();
     }
+
+    /**
+     * Add a piece of news into favorites
+     * @param newsID news ID
+     */
+    public void star(int newsID) {}
+
+    /**
+     * Remove a piece of news from favorites
+     * @param newsID news ID
+     */
+    public void unStar(int newsID) {}
+
+    /**
+     * Clear cached files
+     */
+    public void clearCache() {}
+
+
 }
