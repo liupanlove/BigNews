@@ -12,7 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import bignews.myapplication.db.Dao;
+import bignews.myapplication.db.DAO;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import bignews.myapplication.db.DaoParam;
+import bignews.myapplication.db.DAOParam;
 import bignews.myapplication.db.HeadLine;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,7 +41,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
     private static final String TAG = "HeadlinesFragment";
     private static final int LIMIT = 5;
-    Dao dao = Dao.getInstance(); //should be a singleton.
+    DAO dao = DAO.getInstance(); //should be a singleton.
 
     private String mText;
 
@@ -147,7 +147,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     }
 
     private void loadNewsData() {
-        final DaoParam param = DaoParam.fromCategory(Integer.parseInt(mText), news.size(), LIMIT);
+        final DAOParam param = DAOParam.fromCategory(Integer.parseInt(mText), news.size(), LIMIT);
         //news = dao.getNewsList(param);
         Single.create(new SingleOnSubscribe<ArrayList<HeadLine>>() {
             @Override

@@ -20,13 +20,13 @@ import android.support.annotation.Nullable;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import bignews.myapplication.db.Dao;
-import bignews.myapplication.db.DaoParam;
+import bignews.myapplication.db.DAO;
+import bignews.myapplication.db.DAOParam;
 
 public class ArticleFragment extends BaseActivity {
     final static String ARG_POSITION = "position";
     int mCurrentPosition = -1;
-    Dao dao = Dao.getInstance();
+    DAO dao = DAO.getInstance();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public class ArticleFragment extends BaseActivity {
 
     public void updateArticleView(int position) {
         TextView article = (TextView) findViewById(R.id.article);
-        article.setText(dao.getNews(DaoParam.fromNewsId(position)).newsTitle);
+        article.setText(dao.getNews(DAOParam.fromNewsId(position)).newsTitle);
         mCurrentPosition = position;
     }
 

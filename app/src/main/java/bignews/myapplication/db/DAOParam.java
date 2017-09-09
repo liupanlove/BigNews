@@ -4,7 +4,7 @@ package bignews.myapplication.db;
  * Created by lazycal on 2017/9/8.
  */
 
-public class DaoParam {
+public class DAOParam {
     /**
      * News category [-1-12], zero means recommendation, -1 means Favorites
      */
@@ -18,7 +18,7 @@ public class DaoParam {
      */
     public int newsID;
     /**
-     * When doing a query via @link{Dao}, specifying offset is useful for avoiding loading data
+     * When doing a query via @link{DAO}, specifying offset is useful for avoiding loading data
      * that is previously loaded.
      */
     public int offset;
@@ -40,18 +40,18 @@ public class DaoParam {
      */
     public int mode;
 
-    public DaoParam() {}
+    public DAOParam() {}
 
-    public static DaoParam fromCategory(int category, int offset, int limit) {
-        DaoParam dp = new DaoParam();
+    public static DAOParam fromCategory(int category, int offset, int limit) {
+        DAOParam dp = new DAOParam();
         dp.category = category;
         dp.offset = offset;
         dp.limit = limit;
         return dp;
     }
 
-    public static DaoParam fromNewsId(int newsID) {
-        DaoParam dp = new DaoParam();
+    public static DAOParam fromNewsId(int newsID) {
+        DAOParam dp = new DAOParam();
         dp.newsID = newsID;
         return dp;
     }
