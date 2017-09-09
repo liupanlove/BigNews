@@ -2,6 +2,9 @@ package bignews.myapplication.db;
 
 import java.util.ArrayList;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
@@ -41,7 +44,7 @@ public class DAO {
      * @param param parameter
      * @return The news body
      */
-    public News getNews(final DAOParam param)
+    public Single<News> getNews(final DAOParam param)
     {
         return Single.just(new News())
                 .map(new Function<News, News>() {
@@ -50,8 +53,7 @@ public class DAO {
                         news.newsTitle = ""+param.newsID;
                         return news;
                     }
-                })
-                .blockingGet();
+                });
     }
 
     /**
@@ -61,8 +63,9 @@ public class DAO {
      * @param param parameter
      * @return An ArrayList containing the headlines
      */
-    public ArrayList<HeadLine> getNewsList(final DAOParam param)
+    public Single<ArrayList<Headline>> getNewsList(final DAOParam param)
     {
+        return APICaller.getInstance().loadHeadlines(param);
         /*
         cnt += 1;
         if (cnt % 5 == 0) try {
@@ -75,13 +78,14 @@ public class DAO {
         Log.i(TAG, "getNewsList: After: "+Headlines);
         return (ArrayList<String>) Headlines.clone();
         */
-        return Single.just(new ArrayList<HeadLine>())
-                .map(new Function<ArrayList<HeadLine>, ArrayList<HeadLine>>() {
+        /*
+        return Single.just(new ArrayList<Headline>())
+                .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {
                     @Override
-                    public ArrayList<HeadLine> apply(@NonNull ArrayList<HeadLine> headLines) throws Exception {
+                    public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headLines) throws Exception {
 
                         for (int i = param.offset; i < param.offset + param.limit; ++i) {
-                            HeadLine headline = new HeadLine();
+                            Headline headline = new Headline();
                             headline.newsTitle = "title:" + i;
                             headline.newsClass = param.category + "";
                             headline.newsID = i + "";
@@ -91,24 +95,47 @@ public class DAO {
                     }
                 })
                 .blockingGet();
+                */
     }
 
     /**
      * Add a piece of news into favorites
      * @param newsID news ID
      */
-    public void star(int newsID) {}
+    public Completable star(int newsID) {
+        return Completable.fromRunnable(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
 
     /**
      * Remove a piece of news from favorites
      * @param newsID news ID
      */
-    public void unStar(int newsID) {}
+    public Completable unStar(int newsID) {
+        return Completable.fromRunnable(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
 
     /**
      * Clear cached files
      */
-    public void clearCache() {}
+    public Completable clearCache()
+    {
+        return Completable.fromRunnable(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
 
 
 }
