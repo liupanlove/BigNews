@@ -20,12 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import bignews.myapplication.db.DaoParameter;
+import bignews.myapplication.db.DaoParam;
+import bignews.myapplication.db.HeadLine;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleObserver;
@@ -33,8 +31,6 @@ import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.internal.observers.ConsumerSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -44,6 +40,7 @@ import io.reactivex.schedulers.Schedulers;
 public class HeadlinesFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     private static final String TAG = "HeadlinesFragment";
+    private static final int LIMIT = 5;
     Dao dao = Dao.getInstance(); //should be a singleton.
 
     private String mText;
@@ -51,23 +48,23 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     @BindView(R.id.listView)
     PullToRefreshListView listView;
 
-    private List<String/*NewsBean*/> news = new ArrayList<>();
+    private List<HeadLine> news = new ArrayList<>();
     OnHeadlineSelectedListener mCallback;
-    private ArrayAdapter<String> adapter;
-    private SingleObserver<? super ArrayList<String>> subscriber = new SingleObserver<ArrayList<String>>() {
+    private ArrayAdapter<HeadLine> adapter;
+    private SingleObserver<? super ArrayList<HeadLine>> subscriber = new SingleObserver<ArrayList<HeadLine>>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
             disposable = d;
         }
 
         @Override
-        public void onSuccess(@NonNull ArrayList<String> strings) {
-            news = strings;
-            Log.i(TAG, "onSuccess: loadNewsDatasuccess "+mText+" "+news);
-            adapter.clear();
-            adapter.addAll(news);
+        public void onSuccess(@NonNull ArrayList<HeadLine> strings) {
+            //news.addAll(strings);
+            //adapter.clear();
+            adapter.addAll(strings);
             adapter.notifyDataSetChanged();
             listView.onRefreshComplete();
+            Log.i(TAG, "onSuccess: loadNewsDatasuccess "+mText+" "+news);
         }
 
         @Override
@@ -92,7 +89,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         // Notify the parent activity of selected item
         mCallback = (OnHeadlineSelectedListener)getActivity();
-        mCallback.onArticleSelected(position);
+        mCallback.onArticleSelected(Integer.parseInt(news.get((int)id).newsID));
     }
 
     @Override
@@ -138,7 +135,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         listView.setOnItemClickListener(this);
         int layout = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ?
                 android.R.layout.simple_list_item_activated_1 : android.R.layout.simple_list_item_1;
-        adapter = new ArrayAdapter<String>(getActivity(), layout, news);
+        adapter = new ArrayAdapter<HeadLine>(getActivity(), layout, news);
         listView.setAdapter(adapter);
         loadNewsData();
     }
@@ -150,11 +147,11 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     }
 
     private void loadNewsData() {
-        final DaoParameter param = new DaoParameter(mText);
+        final DaoParam param = DaoParam.fromCategory(Integer.parseInt(mText), news.size(), LIMIT);
         //news = dao.getNewsList(param);
-        Single.create(new SingleOnSubscribe<ArrayList<String>>() {
+        Single.create(new SingleOnSubscribe<ArrayList<HeadLine>>() {
             @Override
-            public void subscribe(@NonNull SingleEmitter<ArrayList<String>> e) throws Exception {
+            public void subscribe(@NonNull SingleEmitter<ArrayList<HeadLine>> e) throws Exception {
                 e.onSuccess(dao.getNewsList(param));
             }
         }).timeout(3, TimeUnit.SECONDS)

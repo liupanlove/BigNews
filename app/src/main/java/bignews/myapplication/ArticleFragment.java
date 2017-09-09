@@ -21,7 +21,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import bignews.myapplication.db.Dao;
-import bignews.myapplication.db.DaoParameter;
+import bignews.myapplication.db.DaoParam;
 
 public class ArticleFragment extends BaseActivity {
     final static String ARG_POSITION = "position";
@@ -45,7 +45,7 @@ public class ArticleFragment extends BaseActivity {
 
     public void updateArticleView(int position) {
         TextView article = (TextView) findViewById(R.id.article);
-        article.setText(dao.getNews(new DaoParameter(position)));
+        article.setText(dao.getNews(DaoParam.fromNewsId(position)).newsTitle);
         mCurrentPosition = position;
     }
 

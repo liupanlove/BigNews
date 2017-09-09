@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,25 +27,40 @@ class ConfigStruct {
 
 public class BaseActivity extends AppCompatActivity {
     private LinearLayout contentLayout;
-    private Activity this_activity;
+
+    private SearchView searchView;
     private Intent config_intent;
     final static public ConfigStruct config_struct = new ConfigStruct();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initContentView(R.layout.base_layout);
-        this_activity = this;
-
-
-        ImageButton config_button = (ImageButton)findViewById(R.id.config_botton);
+        
+	ImageButton config_button = (ImageButton)findViewById(R.id.config_botton);
         config_intent = new Intent(this, ConfigActivity.class);
         config_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.v("Err", "232");
                 startActivity(config_intent);
             }
         });
+
+
+        searchView = (SearchView) findViewById(R.id.searchview);
+        searchView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void  onClick(View view)
+            {
+                openSearchActivity();
+            }
+        });
+    }
+
+    private void openSearchActivity()
+    {
+        Intent intent = new Intent(this, SearchActivity.class);
+        startActivity(intent);
     }
     private void initContentView(int layoutResID) {
         super.setContentView(layoutResID);
