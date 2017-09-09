@@ -11,7 +11,47 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:queryHint="请输入搜索内容"
-        />
+        android:queryHint="请输入搜索内容" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <ListView
+            android:id = "@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider = "@color/gray"
+            android:dividerHeight = "1dp"
+            android:footerDividersEnabled="false"
+            android:headerDividersEnabled="false">
+
+        </ListView>
+            <!--TextView
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:text = "Hello"
+                android:textColor="@color/colorPrimary"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:text = "Hello"
+                android:textColor="@color/colorPrimary"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:text = "Hello"
+                android:textColor="@color/colorPrimary"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:text = "Hello"
+                android:textColor="@color/colorPrimary"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:text = "Hello"
+                android:textColor="@color/colorPrimary"/-->
+    </LinearLayout>
 
 </LinearLayout>
