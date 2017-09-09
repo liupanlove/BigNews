@@ -15,10 +15,20 @@ import android.widget.LinearLayout;
  * Created by guoye on 2017/9/7.
  */
 
+class ConfigStruct {
+    public boolean picture_mode;
+    public boolean day_mode;
+    public ConfigStruct() {
+        picture_mode = true;
+        day_mode = true;
+    }
+}
+
 public class BaseActivity extends AppCompatActivity {
     private LinearLayout contentLayout;
     private Activity this_activity;
     private Intent config_intent;
+    final static public ConfigStruct config_struct = new ConfigStruct();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
