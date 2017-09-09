@@ -21,13 +21,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import bignews.myapplication.db.DAOParam;
-import bignews.myapplication.db.HeadLine;
+import bignews.myapplication.db.Headline;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
 import io.reactivex.SingleObserver;
-import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
@@ -48,17 +45,17 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     @BindView(R.id.listView)
     PullToRefreshListView listView;
 
-    private List<HeadLine> news = new ArrayList<>();
+    private List<Headline> news = new ArrayList<>();
     OnHeadlineSelectedListener mCallback;
-    private ArrayAdapter<HeadLine> adapter;
-    private SingleObserver<? super ArrayList<HeadLine>> subscriber = new SingleObserver<ArrayList<HeadLine>>() {
+    private ArrayAdapter<Headline> adapter;
+    private SingleObserver<? super ArrayList<Headline>> subscriber = new SingleObserver<ArrayList<Headline>>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
             disposable = d;
         }
 
         @Override
-        public void onSuccess(@NonNull ArrayList<HeadLine> strings) {
+        public void onSuccess(@NonNull ArrayList<Headline> strings) {
             //news.addAll(strings);
             //adapter.clear();
             adapter.addAll(strings);
@@ -69,7 +66,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
         @Override
         public void onError(@NonNull Throwable e) {
-            Log.i(TAG, "onError: timeout");
+            Log.i(TAG, "onError: "+e);
             listView.onRefreshComplete();
         }
     };
@@ -135,7 +132,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         listView.setOnItemClickListener(this);
         int layout = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ?
                 android.R.layout.simple_list_item_activated_1 : android.R.layout.simple_list_item_1;
-        adapter = new ArrayAdapter<HeadLine>(getActivity(), layout, news);
+        adapter = new ArrayAdapter<Headline>(getActivity(), layout, news);
         listView.setAdapter(adapter);
         loadNewsData();
     }
@@ -149,12 +146,14 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     private void loadNewsData() {
         final DAOParam param = DAOParam.fromCategory(Integer.parseInt(mText), news.size(), LIMIT);
         //news = dao.getNewsList(param);
-        Single.create(new SingleOnSubscribe<ArrayList<HeadLine>>() {
+        /*Single.create(new SingleOnSubscribe<ArrayList<Headline>>() {
             @Override
-            public void subscribe(@NonNull SingleEmitter<ArrayList<HeadLine>> e) throws Exception {
+            public void subscribe(@NonNull SingleEmitter<ArrayList<Headline>> e) throws Exception {
                 e.onSuccess(dao.getNewsList(param));
             }
-        }).timeout(3, TimeUnit.SECONDS)
+        })*/
+        dao.getNewsList(param)
+                .timeout(3, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(subscriber);

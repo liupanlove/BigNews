@@ -72,7 +72,7 @@ public class ArticleFragment extends Activity {
     public void updateArticleView(int position)
     {
         TextView article = (TextView) findViewById(R.id.article);
-        article.setText(dao.getNews(DAOParam.fromNewsId(position)).newsTitle);
+        article.setText(dao.getNews(DAOParam.fromNewsId(position)).blockingGet().newsTitle);
         mCurrentPosition = position;
     }
 
