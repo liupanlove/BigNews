@@ -14,11 +14,11 @@ import retrofit2.http.Query;
 
 public interface APIService {
     @GET("latest")//?pageNo={pageNO}&pageSize={pageSize}&category={category}")
-    Single<ArrayList<Headline>> loadHeadlines(@Query("pageNo") int pageNo,
+    Single<HeadlineResponse> loadHeadlines(@Query("pageNo") int pageNo,
                                               @Query("pageSize") int pageSize,
                                               @Query("category") int category);
     @GET("search")//?keyword={keyword}&pageNo={pageNo}&pageSize={pageSize}&category={category}")
-    Single<ArrayList<Headline>> loadHeadlines(@Query("pageNo") int pageNo,
+    Single<HeadlineResponse> loadHeadlines(@Query("pageNo") int pageNo,
                                               @Query("pageSize") int pageSize,
                                               @Query("category") int category,
                                               @Query("keyword") String keyword);
