@@ -4,7 +4,15 @@ import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.Vector;
 
 import bignews.myapplication.BaseActivity;
 import bignews.myapplication.R;
@@ -14,6 +22,10 @@ import bignews.myapplication.R;
  */
 
 public class ConfigActivity extends BaseActivity {
+    private ArrayAdapter<String> class_adapter;
+    Vector<String> class_data;
+    private ArrayAdapter<String> shield_adapter;
+    Vector<String> shield_data;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +45,6 @@ public class ConfigActivity extends BaseActivity {
         check_day_mode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if (BaseActivity.config_struct.day_mode)
                     ((ImageButton)view).setImageResource(R.drawable.night);
                 else
@@ -41,6 +52,118 @@ public class ConfigActivity extends BaseActivity {
                 BaseActivity.config_struct.day_mode = !BaseActivity.config_struct.day_mode;
             }
         });
+//vvvvvvvvvvv class vvvvvvvvvvvvvvvv
+        ImageButton class_trash = (ImageButton)findViewById(R.id.class_trash);
+        class_trash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (BaseActivity.config_struct.class_list_deleting)
+                    ((ImageButton)view).setImageResource(R.drawable.trash);
+                else
+                    ((ImageButton)view).setImageResource(R.drawable.trash_red);
+                BaseActivity.config_struct.class_list_deleting = !BaseActivity.config_struct.class_list_deleting;
+            }
+        });
+        final ListView class_view = (ListView)findViewById(R.id.class_list);
+        class_data = getClasses();
+        class_adapter = new ArrayAdapter<String>(this, R.layout.list_item, class_data);
+        class_view.setAdapter(class_adapter);
+        class_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String result = adapterView.getItemAtPosition(i).toString();
+                if (BaseActivity.config_struct.class_list_deleting) {
+                    class_data.remove(i);
+                    class_adapter.notifyDataSetChanged();
+                    Toast.makeText(ConfigActivity.this, result + " deleted", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        Button class_add = (Button)findViewById(R.id.class_add);
+        class_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String text = ((EditText)findViewById(R.id.class_content)).getText().toString();
+                class_data.add(text);
+                class_adapter.notifyDataSetChanged();
+                ((EditText)findViewById(R.id.class_content)).setText("");
+            }
+        });
+//vvvvvvvvvvv shield vvvvvvvvvvvvvv
+        ImageButton shield_trash = (ImageButton)findViewById(R.id.shield_trash);
+        shield_trash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (BaseActivity.config_struct.shield_list_deleting)
+                    ((ImageButton)view).setImageResource(R.drawable.trash);
+                else
+                    ((ImageButton)view).setImageResource(R.drawable.trash_red);
+                BaseActivity.config_struct.shield_list_deleting = !BaseActivity.config_struct.shield_list_deleting;
+            }
+        });
+        final ListView shield_view = (ListView)findViewById(R.id.shield_list);
+        shield_data = getShields();
+        shield_adapter = new ArrayAdapter<String>(this, R.layout.list_item, shield_data);
+        shield_view.setAdapter(shield_adapter);
+        shield_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String result = adapterView.getItemAtPosition(i).toString();
+                if (BaseActivity.config_struct.shield_list_deleting) {
+                    shield_data.remove(i);
+                    shield_adapter.notifyDataSetChanged();
+                    Toast.makeText(ConfigActivity.this, result + " deleted", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        Button shield_add = (Button)findViewById(R.id.shield_add);
+        shield_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String text = ((EditText)findViewById(R.id.shield_content)).getText().toString();
+                shield_data.add(text);
+                shield_adapter.notifyDataSetChanged();
+                ((EditText)findViewById(R.id.shield_content)).setText("");
+            }
+        });
 
+    }
+    private Vector<String> getClasses() {
+        Vector<String> ans = new Vector<String>();
+        ans.add("123");
+        ans.add("124");
+        ans.add("125");
+        ans.add("123");
+        ans.add("124");
+        ans.add("125");
+        ans.add("123");
+        ans.add("124");
+        ans.add("125");
+        ans.add("123");
+        ans.add("124");
+        ans.add("125");
+        ans.add("123");
+        ans.add("124");
+        ans.add("125");
+        return ans;
+    }
+    private Vector<String> getShields() {
+        Vector<String> ans = new Vector<String>();
+        ans.add("123");
+        ans.add("124");
+        ans.add("125");
+        ans.add("123");
+        ans.add("124");
+        ans.add("125");
+        ans.add("123");
+        ans.add("124");
+        ans.add("125");
+        ans.add("123");
+        ans.add("124");
+        ans.add("125");
+        ans.add("123");
+        ans.add("124");
+        ans.add("125");
+        return ans;
     }
 }
