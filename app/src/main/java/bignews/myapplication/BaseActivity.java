@@ -19,9 +19,13 @@ import android.widget.LinearLayout;
 class ConfigStruct {
     public boolean picture_mode;
     public boolean day_mode;
+    public boolean class_list_deleting;
+    public boolean shield_list_deleting;
     public ConfigStruct() {
         picture_mode = true;
         day_mode = true;
+        class_list_deleting = false;
+        shield_list_deleting = false;
     }
 }
 
