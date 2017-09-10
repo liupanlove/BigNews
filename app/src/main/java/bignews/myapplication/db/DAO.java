@@ -1,10 +1,15 @@
 package bignews.myapplication.db;
 
+import android.arch.persistence.room.Room;
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import java.util.ArrayList;
 
+import bignews.myapplication.db.dao.HeadlineDao;
+import bignews.myapplication.db.dao.KeywordDao;
+import bignews.myapplication.db.dao.NewsDao;
 import io.reactivex.Completable;
-import io.reactivex.CompletableObserver;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
@@ -14,28 +19,42 @@ import io.reactivex.functions.Function;
  */
 
 public class DAO {
-    private static final String TAG = "dao";
-    static int cnt = 0;
-    private ArrayList<String> Headlines = new ArrayList<String>();
-    {
-        Headlines.add("Article One");
-        Headlines.add("Article Two");
-    };
 
-    private String[] Articles = {
-            "Article One\n\nExcepteur pour-over occaecat squid biodiesel umami gastropub, nulla laborum salvia dreamcatcher fanny pack. Ullamco culpa retro ea, trust fund excepteur eiusmod direct trade banksy nisi lo-fi cray messenger bag. Nesciunt esse carles selvage put a bird on it gluten-free, wes anderson ut trust fund twee occupy viral. Laboris small batch scenester pork belly, leggings ut farm-to-table aliquip yr nostrud iphone viral next level. Craft beer dreamcatcher pinterest truffaut ethnic, authentic brunch. Esse single-origin coffee banksy do next level tempor. Velit synth dreamcatcher, magna shoreditch in american apparel messenger bag narwhal PBR ennui farm-to-table.",
-            "Article Two\n\nVinyl williamsburg non velit, master cleanse four loko banh mi. Enim kogi keytar trust fund pop-up portland gentrify. Non ea typewriter dolore deserunt Austin. Ad magna ethical kogi mixtape next level. Aliqua pork belly thundercats, ut pop-up tattooed dreamcatcher kogi accusamus photo booth irony portland. Semiotics brunch ut locavore irure, enim etsy laborum stumptown carles gentrify post-ironic cray. Butcher 3 wolf moon blog synth, vegan carles odd future."
-    };
+    Context context;
+    private static final String TAG = "dao";
     private static DAO dao;
+    private AppDatabase mDb;
+    private HeadlineDao headlineDao;
+    private NewsDao newsDao;
+    private KeywordDao keywordDao;
+
+    public Preferences getSettings() {
+        return new Preferences(context);
+    }
+
+    public boolean setSettings(Preferences settings) {
+        return new Preferences(context, settings).commit();
+    }
 
     private DAO() {}
 
+    public synchronized static DAO getInstance() {
+        if (dao == null) throw new AssertionError("dao is null. please call init first");
+        return dao;
+    }
     /**
      * Return a singleton.
      * @return the instance of dao
      */
-    public synchronized static DAO getInstance() {
-        if (dao == null) dao = new DAO();
+    public synchronized static DAO init(Context context) {
+        if (dao == null) {
+            dao = new DAO();
+            dao.context = context;
+            dao.mDb = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "bignews").build();
+            dao.headlineDao = dao.mDb.headlineDao();
+            dao.newsDao = dao.mDb.newsDao();
+            dao.keywordDao = dao.mDb.keywordDao();
+        }
         return dao;
     }
 
@@ -50,7 +69,7 @@ public class DAO {
                 .map(new Function<News, News>() {
                     @Override
                     public News apply(@NonNull News news) throws Exception {
-                        news.newsTitle = ""+param.newsID;
+                        news.news_Title = ""+param.newsID;
                         return news;
                     }
                 });
@@ -63,7 +82,7 @@ public class DAO {
      * @param param parameter
      * @return An ArrayList containing the headlines
      */
-    public Single<ArrayList<Headline>> getNewsList(final DAOParam param)
+    public Single<ArrayList<Headline>> getHeadlineList(final DAOParam param)
     {
         return APICaller.getInstance().loadHeadlines(param);
         /*
@@ -73,9 +92,9 @@ public class DAO {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Log.i(TAG, "getNewsList: Before: "+Headlines);
+        Log.i(TAG, "getHeadlineList: Before: "+Headlines);
         Headlines.add(String.valueOf(cnt));
-        Log.i(TAG, "getNewsList: After: "+Headlines);
+        Log.i(TAG, "getHeadlineList: After: "+Headlines);
         return (ArrayList<String>) Headlines.clone();
         */
         /*
@@ -86,8 +105,8 @@ public class DAO {
 
                         for (int i = param.offset; i < param.offset + param.limit; ++i) {
                             Headline headline = new Headline();
-                            headline.newsTitle = "title:" + i;
-                            headline.newsClass = param.category + "";
+                            headline.news_Title = "title:" + i;
+                            headline.newsClassTag = param.category + "";
                             headline.newsID = i + "";
                             headLines.add(headline);
                         }

@@ -24,6 +24,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Vector;
+
 /**
  * Created by guoye on 2017/9/7.
  */
@@ -33,11 +36,17 @@ class ConfigStruct {
     public boolean day_mode;
     public boolean class_list_deleting;
     public boolean shield_list_deleting;
+    public boolean class_changed;
+    public Vector<String> class_data;
+    public Vector<String> shield_data;
     public ConfigStruct() {
         picture_mode = true;
         day_mode = true;
         class_list_deleting = false;
         shield_list_deleting = false;
+        class_changed = false;
+        class_data = ConfigActivity.getClasses();
+        shield_data = ConfigActivity.getShields();
     }
 }
 
@@ -53,7 +62,7 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initContentView(R.layout.base_layout);
         
-	ImageButton config_button = (ImageButton)findViewById(R.id.config_botton);
+	    ImageButton config_button = (ImageButton)findViewById(R.id.config_botton);
         config_intent = new Intent(this, ConfigActivity.class);
         config_button.setOnClickListener(new View.OnClickListener() {
             @Override
