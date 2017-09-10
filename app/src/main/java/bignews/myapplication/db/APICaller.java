@@ -2,7 +2,9 @@ package bignews.myapplication.db;
 
 import java.util.ArrayList;
 
+import bignews.myapplication.db.service.APIService;
 import bignews.myapplication.db.service.HeadlineResponse;
+import bignews.myapplication.utils.Tools;
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.BiFunction;
@@ -22,10 +24,10 @@ public class APICaller {
         return instance;
     }
     Single<ArrayList<Headline>> loadHeadlines(final DAOParam param) {
-        return /*Tools.getRetrofit()
+        return Tools.getRetrofit()
                 .create(APIService.class)
-                .loadHeadlines(0, param.limit + param.offset, param.category)*/
-        Single.just(new HeadlineResponse())
+                .loadHeadlines(1, param.limit + param.offset, param.category)
+        /*Single.just(new HeadlineResponse())
                 .map(new Function<HeadlineResponse, HeadlineResponse>() {
                     @Override
                     public HeadlineResponse apply(@NonNull HeadlineResponse headlineResponse) throws Exception {
@@ -38,7 +40,7 @@ public class APICaller {
                         }
                         return headlineResponse;
                     }
-                })
+                })*/
                 .flattenAsObservable(new Function<HeadlineResponse, ArrayList<Headline>>() {
                     @Override
                     public ArrayList<Headline> apply(@NonNull HeadlineResponse headlineResponse) throws Exception {
