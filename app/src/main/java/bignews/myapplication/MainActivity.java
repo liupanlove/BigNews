@@ -9,9 +9,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -21,17 +23,59 @@ public class MainActivity extends BaseActivity
         implements HeadlinesFragment.OnHeadlineSelectedListener{
 
     private static final String TAG = "MainActivity";
-    private String titles[];
-    {
-        titles = new String[]{"1", "2", "3", "4", "5", "6", "7"};
+    private Vector<Fragment> fragments;
+    private TabFragmentAdapter tab_adapter;
+    public void refreshTag() {
+        Log.v("Err", "244");
+        for (int i = fragments.size() - 1; i >= 0; --i) {
+            String tag = fragments.get(i).getArguments().getString("text");
+            boolean got = false;
+            for (int j = 0; j < BaseActivity.config_struct.class_data.size(); ++j)
+                if (BaseActivity.config_struct.class_data.get(j).equals(tag)) {
+                    got = true;
+                    break;
+                }
+            if (!got) {
+                Log.v("Err", tag);
+                fragments.remove(i);
+            }
+        }
+        for (int i = 0; i < BaseActivity.config_struct.class_data.size(); ++i) {
+            String tag = BaseActivity.config_struct.class_data.get(i);
+            boolean got = false;
+            for (int j = 0; j < fragments.size(); ++j)
+                if (tag.equals(fragments.get(j).getArguments().getString("text"))) {
+                    got = true;
+                    break;
+                }
+            if (!got) {
+                Log.v("Err", tag);
+                Fragment fragment = new HeadlinesFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("text",tag);
+                fragment.setArguments(bundle);
+                fragments.add(fragment);
+            }
+        }
+        tab_adapter.notifyDataSetChanged();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (BaseActivity.config_struct.class_changed) {
+            BaseActivity.config_struct.class_changed = false;
+            refreshTag();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
-        final List<Fragment> fragments = new ArrayList<Fragment>();
+        fragments = new Vector<>();
         /*Observable.fromArray(titles)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<String>() {
@@ -44,15 +88,16 @@ public class MainActivity extends BaseActivity
                         fragments.add(fragment);
                     }
                 });*/
-        for (int i = 0; i < titles.length; ++i) {
+        for (int i = 0; i < BaseActivity.config_struct.class_data.size(); ++i) {
             Fragment fragment = new HeadlinesFragment();
             Bundle bundle = new Bundle();
-            bundle.putString("text",titles[i]);
+            bundle.putString("text",BaseActivity.config_struct.class_data.get(i));
             fragment.setArguments(bundle);
             fragments.add(fragment);
         }
         Log.i(TAG, "onCreate: "+fragments.size());
-        viewPager.setAdapter(new TabFragmentAdapter(fragments, titles, getSupportFragmentManager(), this));
+        tab_adapter = new TabFragmentAdapter(fragments, BaseActivity.config_struct.class_data, getSupportFragmentManager(), this);
+        viewPager.setAdapter(tab_adapter);
         // 初始化
         TabLayout tablayout = (TabLayout) findViewById(R.id.tablayout);
 // 将ViewPager和TabLayout绑定
