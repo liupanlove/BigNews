@@ -19,61 +19,68 @@
     <LinearLayout
         android:id="@+id/layout_bottom"
         android:layout_width="match_parent"
-        android:layout_height="50dp">      <!--表示在容器底部 -->
+        android:layout_height="wrap_content">      <!--表示在容器底部 -->
 
         <LinearLayout
             android:id="@+id/layout_news"
-            style="@style/MainBottomLayout">
+            style="@style/MainBottomLayout1">
 
             <ImageButton
-                style="@style/MainBottomImageButton"
-                android:background="@drawable/home"/>
+                android:id = "@+id/weChatFriend"
+                style="@style/MainBottomImageButton1"
+                android:background="@color/white"
+                android:src = "@drawable/wechat"/>
 
             <TextView
-                style="@style/MainBottomTextView"
+                style="@style/MainBottomTextView1"
                 android:enabled="false"
-                android:text="新闻" />
+                android:text="微信好友" />
         </LinearLayout>
-        <LinearLayout
+        <!--LinearLayout
             android:id = "@+id/layout_settings"
-            style="@style/MainBottomLayout">
+            style="@style/MainBottomLayout1">
 
             <ImageButton
-                style="@style/MainBottomImageButton"
-                android:id="@+id/config_botton"
+                style="@style/MainBottomImageButton1"
+                android:id="@+id/weChatZone"
                 android:background="@drawable/settings"/>
 
             <TextView
-                style="@style/MainBottomTextView"
+                style="@style/MainBottomTextView1"
                 android:enabled="false"
-                android:text="设置"/>
+                android:text="朋友圈"/>
+        </LinearLayout-->
+        <LinearLayout
+            style="@style/MainBottomLayout1">
+
+            <ImageButton
+                style="@style/MainBottomImageButton1"
+                android:id = "@+id/qq"
+                android:src="@drawable/qq"
+                android:background="@color/white"/>
+
+            <TextView
+                style="@style/MainBottomTextView1"
+                android:enabled="false"
+                android:text="手机QQ" />
         </LinearLayout>
         <LinearLayout
-            style="@style/MainBottomLayout">
+            style="@style/MainBottomLayout1">
 
             <ImageButton
-                style="@style/MainBottomImageButton"
-                android:background="@drawable/settings"/>
+                android:id = "@+id/weiBo"
+                style="@style/MainBottomImageButton1"
+                android:src="@drawable/weibo"
+                android:background="@color/white"/>
 
             <TextView
-                style="@style/MainBottomTextView"
+                style="@style/MainBottomTextView1"
                 android:enabled="false"
-                android:text="设置" />
-        </LinearLayout>
-        <LinearLayout
-            style="@style/MainBottomLayout">
-
-            <ImageButton
-                style="@style/MainBottomImageButton"
-                android:background="@drawable/settings"/>
-
-            <TextView
-                style="@style/MainBottomTextView"
-                android:enabled="false"
-                android:text="设置" />
+                android:text="微博" />
         </LinearLayout>
     </LinearLayout>
-    <TextView
+    <Button
+        android:id = "@+id/collect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -81,8 +88,9 @@
         android:background="@color/white"
         android:textColor="@color/gold"
         android:layout_marginTop="20dp"
-        android:layout_weight="0.23"/>
-    <TextView
+        android:layout_weight="0.2"/>
+    <Button
+        android:id="@+id/cancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -90,5 +98,5 @@
         android:background="@color/white"
         android:textColor="@android:color/black"
         android:layout_marginTop="20dp"
-        android:layout_weight="0.25"/>
+        android:layout_weight="0.2"/>
 </LinearLayout>
