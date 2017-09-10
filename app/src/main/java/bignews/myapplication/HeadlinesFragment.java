@@ -24,13 +24,10 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import bignews.myapplication.db.DAOParam;
-import bignews.myapplication.db.HeadLine;
+import bignews.myapplication.db.Headline;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
 import io.reactivex.SingleObserver;
-import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
@@ -51,7 +48,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     @BindView(R.id.listView)
     PullToRefreshListView listView;
 
-    private List<HeadLine> news = new ArrayList<>();
+    private List<Headline> news = new ArrayList<>();
     OnHeadlineSelectedListener mCallback;
     List<Map<String, Object>> datas = new ArrayList<>();
     private SimpleAdapter adapter;
@@ -78,7 +75,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
         @Override
         public void onError(@NonNull Throwable e) {
-            Log.i(TAG, "onError: timeout");
+            Log.i(TAG, "onError: "+e);
             listView.onRefreshComplete();
         }
     };
@@ -158,12 +155,14 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     private void loadNewsData() {//!!!BUG
         final DAOParam param = DAOParam.fromCategory(Integer.parseInt(mText), news.size(), LIMIT);
         //news = dao.getNewsList(param);
-        Single.create(new SingleOnSubscribe<ArrayList<HeadLine>>() {
+        /*Single.create(new SingleOnSubscribe<ArrayList<Headline>>() {
             @Override
-            public void subscribe(@NonNull SingleEmitter<ArrayList<HeadLine>> e) throws Exception {
+            public void subscribe(@NonNull SingleEmitter<ArrayList<Headline>> e) throws Exception {
                 e.onSuccess(dao.getNewsList(param));
             }
-        }).timeout(3, TimeUnit.SECONDS)
+        })*/
+        dao.getNewsList(param)
+                .timeout(3, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(subscriber);
