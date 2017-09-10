@@ -2,9 +2,7 @@ package bignews.myapplication.db;
 
 import java.util.ArrayList;
 
-import bignews.myapplication.db.service.APIService;
 import bignews.myapplication.db.service.HeadlineResponse;
-import bignews.myapplication.utils.Tools;
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.BiFunction;
@@ -34,8 +32,8 @@ public class APICaller {
                         headlineResponse.headlines = new ArrayList<Headline>();
                         for (int i = param.offset; i < param.limit; ++i) {
                             Headline headline = new Headline();
-                            headline.newsTitle = "" + i;
-                            headline.newsID = "" + i;
+                            headline.news_Title = "" + i;
+                            headline.news_ID = "" + i;
                             headlineResponse.headlines.add(headline);
                         }
                         return headlineResponse;

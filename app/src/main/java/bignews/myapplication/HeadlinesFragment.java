@@ -86,7 +86,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         // Notify the parent activity of selected item
         mCallback = (OnHeadlineSelectedListener)getActivity();
-        mCallback.onArticleSelected(Integer.parseInt(news.get((int)id).newsID));
+        mCallback.onArticleSelected(Integer.parseInt(news.get((int)id).news_ID));
     }
 
     @Override
@@ -145,14 +145,14 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
     private void loadNewsData() {
         final DAOParam param = DAOParam.fromCategory(Integer.parseInt(mText), news.size(), LIMIT);
-        //news = dao.getNewsList(param);
+        //news = dao.getHeadlineList(param);
         /*Single.create(new SingleOnSubscribe<ArrayList<Headline>>() {
             @Override
             public void subscribe(@NonNull SingleEmitter<ArrayList<Headline>> e) throws Exception {
-                e.onSuccess(dao.getNewsList(param));
+                e.onSuccess(dao.getHeadlineList(param));
             }
         })*/
-        dao.getNewsList(param)
+        dao.getHeadlineList(param)
                 .timeout(3, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
