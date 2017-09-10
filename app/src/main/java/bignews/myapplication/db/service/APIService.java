@@ -26,7 +26,7 @@ public interface APIService {
                                               @Query("category") int category,
                                               @Query("keyword") String keyword);
     @GET("detail")//?newsId={newsId}")
-    Single<News> loadNews(@Query("newsId") int newsID);
+    Single<News> loadNews(@Query("newsId") String newsID);
 
 
     @GET("latest")//?pageNo={pageNO}&pageSize={pageSize}&category={category}")

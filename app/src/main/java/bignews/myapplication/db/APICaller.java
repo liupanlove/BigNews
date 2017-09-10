@@ -23,6 +23,11 @@ public class APICaller {
         if (instance == null) { instance = new APICaller(); }
         return instance;
     }
+    Single<News> loadNews(final DAOParam param) {
+        return Tools.getRetrofit()
+                .create(APIService.class)
+                .loadNews(param.newsID);
+    }
     Single<ArrayList<Headline>> loadHeadlines(final DAOParam param) {
         return Tools.getRetrofit()
                 .create(APIService.class)

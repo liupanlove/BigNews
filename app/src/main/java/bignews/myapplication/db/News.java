@@ -17,5 +17,9 @@ public class News extends Headline {
     //ArrayList<String> persons;
     @Ignore
     public ArrayList<Pair<String, Double>> keywords;
-    public String newsHTML;
+
+    @Override
+    public String toString() {
+        return "News{"+super.toString()+"}";
+    }
 }

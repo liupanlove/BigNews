@@ -5,6 +5,8 @@ package bignews.myapplication.db;
  */
 
 public class DAOParam {
+    public static final int FAVORITE = -1;
+    public static final int RECOMMENDATION = 0;
     /**
      * News category [-1-12], zero means recommendation, -1 means Favorites
      */
@@ -16,7 +18,7 @@ public class DAOParam {
     /**
      * News id
      */
-    public int newsID;
+    public String newsID;
     /**
      * When doing a query via @link{DAO}, specifying offset is useful for avoiding loading data
      * that is previously loaded.
@@ -48,7 +50,7 @@ public class DAOParam {
         return dp;
     }
 
-    public static DAOParam fromNewsId(int newsID) {
+    public static DAOParam fromNewsId(String newsID) {
         DAOParam dp = new DAOParam();
         dp.newsID = newsID;
         return dp;

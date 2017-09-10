@@ -53,7 +53,7 @@ public class AppDatabaseTest {
         headline.news_ID = "firstID";
         headline.newsClassTag = "classTag";
         headlineDao.addHeadline(headline);
-        List<Headline> list = headlineDao.load("classTag", 0, 1);
+        List<Headline> list = headlineDao.load("classTag", 0, 1).blockingGet();
         assertEquals(list.size(), 1);
         Headline fetched = list.get(0);
         assertEquals(fetched.news_Title, headline.news_Title);
