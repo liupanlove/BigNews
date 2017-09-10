@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
 import android.support.v4.view.LayoutInflaterCompat;
@@ -20,7 +21,10 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
+import java.util.Locale;
 
 import bignews.myapplication.db.DAO;
 import bignews.myapplication.db.DAOParam;
@@ -38,9 +42,11 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
     ImageButton qq;
     ImageButton weiBo;
     Button cancel;
-    Button collect;
-    //Toolbar toolBar;
-    LinearLayout linearLayout;
+    private Button collect;
+    private ImageView speaker;
+    private LinearLayout linearLayout;
+    private TextToSpeech tts;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +57,7 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
         Intent intent = getIntent();
         mCurrentPosition = intent.getIntExtra(ARG_POSITION, -1);          //
         updateArticleView(mCurrentPosition);
+        speaker = (ImageView) findViewById(R.id.speaker);
 
         ImageView imageView = (ImageView) findViewById(R.id.menu);
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -65,11 +72,17 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
                 pop.dismiss();
             }
         });
-    }
 
-    @Override
-    public void onStart() {
-        super.onStart();
+        ttsInit();
+
+        speaker.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                tts.speak("我杨国烨觉得你是个大娘们", TextToSpeech.QUEUE_ADD, null);
+            }
+        });
     }
 
     @Override
@@ -103,11 +116,11 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
         }
         Intent intent = new Intent(Intent.ACTION_SEND);
 
-        File f = new File("/storage/emulated/0/DCIM/Camera/IMG_20161125_094646.jpg");
-        Uri u = Uri.fromFile(f);
-        intent.putExtra(intent.EXTRA_STREAM, u);
-        intent.setType("image/*");
-        intent.putExtra("body", "233");
+        //File f = new File("/storage/emulated/0/DCIM/Camera/IMG_20161125_094646.jpg");
+        //Uri u = Uri.fromFile(f);
+        //intent.putExtra(intent.EXTRA_STREAM, u);
+        intent.setType("text/plain");
+        //intent.putExtra("body", "233");
 
         intent.putExtra(Intent.EXTRA_SUBJECT, "这里是分享主题");
         intent.putExtra(Intent.EXTRA_TEXT, "这里是分享内容");
@@ -157,4 +170,28 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
         qq.setOnClickListener(this);
         weiBo.setOnClickListener(this);
     }
+
+    private void ttsInit()
+    {
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status == TextToSpeech.SUCCESS)
+                {
+                    int result = tts.setLanguage(Locale.CHINESE);
+                    tts.setPitch(1.0f);
+                    tts.setSpeechRate(1.0f);
+                    if(result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE) {
+                        Toast.makeText(getApplicationContext(), "暂不支持", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "无法初始化", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
 }

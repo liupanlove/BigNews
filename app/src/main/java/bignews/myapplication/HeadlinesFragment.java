@@ -52,20 +52,20 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     OnHeadlineSelectedListener mCallback;
     List<Map<String, Object>> datas = new ArrayList<>();
     private SimpleAdapter adapter;
-    private SingleObserver<? super ArrayList<HeadLine>> subscriber = new SingleObserver<ArrayList<HeadLine>>() {
+    private SingleObserver<? super ArrayList<Headline>> subscriber = new SingleObserver<ArrayList<Headline>>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
             disposable = d;
         }
 
         @Override
-        public void onSuccess(@NonNull ArrayList<HeadLine> strings) {
+        public void onSuccess(@NonNull ArrayList<Headline> strings) {
             news.addAll(strings);
             for(int i = 0; i < strings.size(); ++i)
             {
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("image", R.drawable.home);
-                map.put("title", strings.get(i).newsTitle + "/" + mText);
+                map.put("title", strings.get(i).news_Title + "/" + mText);
                 datas.add(map);
             }
             adapter.notifyDataSetChanged();

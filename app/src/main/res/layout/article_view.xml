@@ -34,11 +34,20 @@
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:background="@drawable/back"/>
+
         <ImageView
             android:id = "@+id/menu"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:background="@drawable/menu1"
+            android:layout_gravity="right"
+            android:layout_marginRight="10dp"
+            />
+        <ImageView
+            android:id = "@+id/speaker"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/speaker"
             android:layout_gravity="right"
             android:layout_marginRight="10dp"
             />
