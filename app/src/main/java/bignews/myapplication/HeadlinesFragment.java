@@ -11,13 +11,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
 import bignews.myapplication.db.DAO;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import bignews.myapplication.db.DAOParam;
@@ -47,18 +50,24 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
     private List<Headline> news = new ArrayList<>();
     OnHeadlineSelectedListener mCallback;
-    private ArrayAdapter<Headline> adapter;
-    private SingleObserver<? super ArrayList<Headline>> subscriber = new SingleObserver<ArrayList<Headline>>() {
+    List<Map<String, Object>> datas = new ArrayList<>();
+    private SimpleAdapter adapter;
+    private SingleObserver<? super ArrayList<HeadLine>> subscriber = new SingleObserver<ArrayList<HeadLine>>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
             disposable = d;
         }
 
         @Override
-        public void onSuccess(@NonNull ArrayList<Headline> strings) {
-            //news.addAll(strings);
-            //adapter.clear();
-            adapter.addAll(strings);
+        public void onSuccess(@NonNull ArrayList<HeadLine> strings) {
+            news.addAll(strings);
+            for(int i = 0; i < strings.size(); ++i)
+            {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("image", R.drawable.home);
+                map.put("title", strings.get(i).newsTitle + "/" + mText);
+                datas.add(map);
+            }
             adapter.notifyDataSetChanged();
             listView.onRefreshComplete();
             Log.i(TAG, "onSuccess: loadNewsDatasuccess "+mText+" "+news);
@@ -96,6 +105,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         if(getArguments()!=null){
             mText = getArguments().getString("text");
         }
+        loadNewsData();
     }
 
     @Nullable
@@ -130,11 +140,10 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         });
 
         listView.setOnItemClickListener(this);
-        int layout = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ?
-                android.R.layout.simple_list_item_activated_1 : android.R.layout.simple_list_item_1;
-        adapter = new ArrayAdapter<Headline>(getActivity(), layout, news);
+
+        adapter = new SimpleAdapter(getActivity(), datas, R.layout.search_item,
+                                    new String[]{"title", "image"}, new int[]{R.id.title, R.id.image});
         listView.setAdapter(adapter);
-        loadNewsData();
     }
 
     @Override
@@ -143,7 +152,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         super.onViewCreated(view, savedInstanceState);
     }
 
-    private void loadNewsData() {
+    private void loadNewsData() {//!!!BUG
         final DAOParam param = DAOParam.fromCategory(Integer.parseInt(mText), news.size(), LIMIT);
         //news = dao.getHeadlineList(param);
         /*Single.create(new SingleOnSubscribe<ArrayList<Headline>>() {

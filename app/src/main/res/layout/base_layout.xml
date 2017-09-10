@@ -29,7 +29,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_weight="1"
-        android:id = "@+id/content_layout"/>con
+        android:id = "@+id/content_layout"/>
     <LinearLayout
         android:id="@+id/layout_bottom"
         android:layout_width="match_parent"
