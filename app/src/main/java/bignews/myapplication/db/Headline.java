@@ -8,9 +8,8 @@ import android.arch.persistence.room.PrimaryKey;
  * Created by lazycal on 2017/9/9.
  */
 
-@Entity
+@Entity(primaryKeys = {"news_ID", "newsClassTag"})
 public class Headline {
-    @PrimaryKey
     public String news_ID;
     public String newsClassTag, news_Category, news_Source, news_Title, news_Time, news_URL, news_Author, lang_Type,
             news_Pictures, news_Video, news_Intro;

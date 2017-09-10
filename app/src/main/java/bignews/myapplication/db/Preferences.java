@@ -11,9 +11,9 @@ import java.util.Set;
 
 public class Preferences {
     public static final String PREFS_NAME = "MyPrefsFile";
-    private Context context;
     public int classTags; // 1 << (i - 1), i \in [1, 12]
     public boolean isNight;
+    public boolean isOffline;
     public boolean onlyText;
     public Set<String> shieldKeywords;
 
@@ -22,6 +22,7 @@ public class Preferences {
         settings.getInt("classTags", classTags);
         settings.getBoolean("isNight", isNight);
         settings.getBoolean("onlyText", onlyText);
+        settings.getBoolean("isOffline", isOffline);
         settings.getStringSet("shieldKeywords", shieldKeywords);
     }
 
@@ -30,16 +31,29 @@ public class Preferences {
         this.classTags = old_settings.classTags;
         this.isNight = old_settings.isNight;
         this.onlyText = old_settings.onlyText;
+        this.isOffline = old_settings.isOffline;
         this.shieldKeywords = old_settings.shieldKeywords;
     }
 
-    public boolean commit() {
+    public boolean commit(Context context) {
         SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putInt("classTags", classTags);
         editor.putBoolean("isNight", isNight);
         editor.putBoolean("onlyText", onlyText);
+        editor.putBoolean("isOffline", isOffline);
         editor.putStringSet("shieldKeywords", shieldKeywords);
         return editor.commit();
+    }
+
+    @Override
+    public String toString() {
+        return "Preferences{" +
+                "classTags=" + classTags +
+                ", isNight=" + isNight +
+                ", isOffline=" + isOffline +
+                ", onlyText=" + onlyText +
+                ", shieldKeywords=" + shieldKeywords +
+                '}';
     }
 }

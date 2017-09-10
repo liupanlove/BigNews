@@ -75,7 +75,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
         @Override
         public void onError(@NonNull Throwable e) {
-            Log.i(TAG, "onError: "+e);
+            Log.d(TAG, "onError: "+Log.getStackTraceString(e));
             listView.onRefreshComplete();
         }
     };

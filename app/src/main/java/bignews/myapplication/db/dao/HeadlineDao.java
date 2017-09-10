@@ -6,9 +6,14 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.OnConflictStrategy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import bignews.myapplication.db.Headline;
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * Created by lazycal on 2017/9/9.
@@ -16,10 +21,10 @@ import bignews.myapplication.db.Headline;
 @Dao
 public interface HeadlineDao {
     @Query("select * FROM Headline")
-    List<Headline> getAll();
+    Single<List<Headline>> getAll();
 
     @Query("select * from Headline where newsClassTag = :newsClassTag limit :limit offset :offset")
-    List<Headline> load(String newsClassTag, int offset, int limit);
+    Single<List<Headline>> load(String newsClassTag, int offset, int limit);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void addHeadline(Headline headline);

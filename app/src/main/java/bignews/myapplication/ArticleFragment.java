@@ -132,7 +132,7 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
     public void updateArticleView(int position)
     {
         TextView article = (TextView) findViewById(R.id.article);
-        article.setText(dao.getNews(DAOParam.fromNewsId(position)).blockingGet().news_Title);
+        article.setText(dao.getNews(DAOParam.fromNewsId(""+position)).blockingGet().news_Title);
         mCurrentPosition = position;
     }
     /*@Override
