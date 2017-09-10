@@ -29,10 +29,8 @@ public class DAOParam {
     public static class MODE {
         public static final int TEXT = 1;
         public static final int IMAGE = 0;
-        public static final int SHIELD_KEYWORDS = 1 << 1;
-        public static final int MATCH_KEYWORDS = 0 << 1;
-        public static final int OFF_LINE = 1 << 2;
-        public static final int ON_LINE = 0 << 2;
+        public static final int OFF_LINE = 1 << 1;
+        public static final int ON_LINE = 0 << 1;
     }
     /**
      * Text Mode or Normal Mode

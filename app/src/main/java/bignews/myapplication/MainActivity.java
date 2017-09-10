@@ -13,6 +13,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import bignews.myapplication.db.DAO;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -29,6 +30,8 @@ public class MainActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        DAO.init(getApplicationContext());
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         final List<Fragment> fragments = new ArrayList<Fragment>();
