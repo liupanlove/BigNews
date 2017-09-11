@@ -5,18 +5,20 @@ package bignews.myapplication.db;
  */
 
 public class DAOParam {
+    public static final int FAVORITE = -1;
+    public static final int RECOMMENDATION = 0;
     /**
      * News category [-1-12], zero means recommendation, -1 means Favorites
      */
-    public int category;
+    public Integer category;
     /**
-     * News keywords
+     * News Keywords
      */
     public String keywords;
     /**
      * News id
      */
-    public int newsID;
+    public String newsID;
     /**
      * When doing a query via @link{DAO}, specifying offset is useful for avoiding loading data
      * that is previously loaded.
@@ -34,13 +36,21 @@ public class DAOParam {
     }
     /**
      * Text Mode or Normal Mode
-     * Match or shield keywords
+     * Match or shield Keywords
      */
     public int mode;
 
     public DAOParam() {}
 
-    public static DAOParam fromCategory(int category, int offset, int limit) {
+    public static DAOParam fromKeyword(String keywords, Integer offset, Integer limit) {
+        DAOParam dp = new DAOParam();
+        dp.keywords = keywords;
+        dp.offset = offset;
+        dp.limit = limit;
+        return dp;
+    }
+
+    public static DAOParam fromCategory(Integer category, Integer offset, Integer limit) {
         DAOParam dp = new DAOParam();
         dp.category = category;
         dp.offset = offset;
@@ -48,7 +58,19 @@ public class DAOParam {
         return dp;
     }
 
-    public static DAOParam fromNewsId(int newsID) {
+    @Override
+    public String toString() {
+        return "DAOParam{" +
+                "category=" + category +
+                ", keywords='" + keywords + '\'' +
+                ", newsID='" + newsID + '\'' +
+                ", offset=" + offset +
+                ", limit=" + limit +
+                ", mode=" + mode +
+                '}';
+    }
+
+    public static DAOParam fromNewsId(String newsID) {
         DAOParam dp = new DAOParam();
         dp.newsID = newsID;
         return dp;
