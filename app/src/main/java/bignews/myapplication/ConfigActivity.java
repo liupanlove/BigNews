@@ -35,6 +35,10 @@ public class ConfigActivity extends BaseActivity {
         mUiModeManager = (UiModeManager) getSystemService(Context.UI_MODE_SERVICE);
 
         ImageButton check_picture_mode = (ImageButton)findViewById(R.id.check_picture_mode);
+        if (BaseActivity.config_struct.picture_mode)
+            check_picture_mode.setImageResource(R.drawable.yes_picture);
+        else
+            check_picture_mode.setImageResource(R.drawable.no_picture);
         check_picture_mode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -49,7 +53,8 @@ public class ConfigActivity extends BaseActivity {
         check_day_mode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (BaseActivity.config_struct.day_mode) {
+                BaseActivity.config_struct.day_mode = !BaseActivity.config_struct.day_mode;
+                if (!BaseActivity.config_struct.day_mode) {
                     mUiModeManager.enableCarMode(0);
                     mUiModeManager.setNightMode(UiModeManager.MODE_NIGHT_YES);
                 }
@@ -57,7 +62,6 @@ public class ConfigActivity extends BaseActivity {
                     mUiModeManager.disableCarMode(0);
                     mUiModeManager.setNightMode(UiModeManager.MODE_NIGHT_NO);
                 }
-                BaseActivity.config_struct.day_mode = !BaseActivity.config_struct.day_mode;
             }
         });
 //vvvvvvvvvvv class vvvvvvvvvvvvvvvv
