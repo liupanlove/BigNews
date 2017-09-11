@@ -13,6 +13,7 @@ import bignews.myapplication.db.dao.HeadlineDao;
 import bignews.myapplication.db.dao.KeywordDao;
 import bignews.myapplication.db.dao.NewsDao;
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
@@ -57,7 +58,7 @@ public class DAO {
     }
 
     public boolean setSettings(Preferences settings) {
-        return new Preferences(context, settings).commit(context);
+        return settings.commit(context);
     }
 
     private DAO() {}
@@ -101,6 +102,7 @@ public class DAO {
      */
     public Single<News> getNews(final DAOParam param)
     {
+        Log.i(TAG, "getNews: settings="+getSettings());
         return (getSettings().isOffline //TODO: optimize
                 ? newsDao.findByID(param.newsID)
                 .map(new Function<List<News>, News>() { // workaround
@@ -121,6 +123,7 @@ public class DAO {
                 .map(new Function<News, News>() {//TODO: Strange
                     @Override
                     public News apply(@NonNull News news) throws Exception {
+                        if (news.Keywords != null) //TODO: workaround
                         for (Keyword keyword:
                                 news.Keywords) {
                             List<Keyword> keywords = keywordDao.findKeywordByText(keyword.word).blockingGet();
@@ -143,12 +146,20 @@ public class DAO {
      */
     public Single<ArrayList<Headline>> getHeadlineList(final DAOParam param)
     {
-        return ((param.keywords == null)
-        ? (((getSettings().isOffline || param.category == DAOParam.FAVORITE) //TODO: class RECOMMENDATION
-            ? headlineDao.load(classTags.get(param.category), param.offset, param.limit)
-            : APICaller.getInstance().loadHeadlines(param)))
-        : APICaller.getInstance().searchHeadlines(param))
-                .map(new Function<List<Headline>, ArrayList<Headline>>() {// check if visited
+        Single<List<Headline>> fetch;
+        if (param.keywords != null)
+            fetch = APICaller.getInstance().searchHeadlines(param);
+        else if (param.category == DAOParam.FAVORITE)
+            fetch = headlineDao.findHeadlineByFavorite(param.offset, param.limit);
+        else if (param.category == DAOParam.RECOMMENDATION) {
+            //Single<List<Keyword>> highFreq = keywordDao.getHighFreqWord();
+            //fetch = Single.fheadlineDao.findHeadlineByFavorite(param.offset, param.limit);
+            fetch = headlineDao.findHeadlineByFavorite(param.offset, param.limit);
+        }
+        else fetch = ((getSettings().isOffline) //TODO: class RECOMMENDATION
+                    ? headlineDao.load(classTags.get(param.category), param.offset, param.limit)
+                    : APICaller.getInstance().loadHeadlines(param));
+        return fetch.map(new Function<List<Headline>, ArrayList<Headline>>() {// check if visited
                     @Override
                     public ArrayList<Headline> apply(@NonNull List<Headline> headlines) throws Exception {
                         Log.i(TAG, "apply: getHeadlineList");
@@ -166,36 +177,6 @@ public class DAO {
                         return headlines;
                     }
                 });
-        /*
-        cnt += 1;
-        if (cnt % 5 == 0) try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Log.i(TAG, "getHeadlineList: Before: "+Headlines);
-        Headlines.add(String.valueOf(cnt));
-        Log.i(TAG, "getHeadlineList: After: "+Headlines);
-        return (ArrayList<String>) Headlines.clone();
-        */
-        /*
-        return Single.just(new ArrayList<Headline>())
-                .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {
-                    @Override
-                    public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headLines) throws Exception {
-
-                        for (int i = param.offset; i < param.offset + param.limit; ++i) {
-                            Headline headline = new Headline();
-                            headline.news_Title = "title:" + i;
-                            headline.newsClassTag = param.category + "";
-                            headline.newsID = i + "";
-                            headLines.add(headline);
-                        }
-                        return headLines;
-                    }
-                })
-                .blockingGet();
-                */
     }
 
     /**
@@ -207,14 +188,14 @@ public class DAO {
             @Override
             public void run() {
                 Headline headline = getHeadline(DAOParam.fromNewsId(newsID)).blockingGet();
-                headline.newsClassTag = classTags.get(DAOParam.FAVORITE);
+                headline.isFavorite = true;
                 headlineDao.addHeadline(headline);
                 Log.i(TAG, "run: star begin "+newsID);
-                try {
+                /*try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }
+                }*/
                 Log.i(TAG, "run: star end "+newsID);
             }
         });
@@ -228,7 +209,8 @@ public class DAO {
             @Override
             public void run() {
                 Headline headline = getHeadline(DAOParam.fromNewsId(newsID)).blockingGet();
-                headlineDao.deleteHeadline(headline);
+                headline.isFavorite = false;
+                headlineDao.addHeadline(headline);
             }
         });
     }

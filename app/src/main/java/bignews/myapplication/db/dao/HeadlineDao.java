@@ -9,6 +9,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
+import bignews.myapplication.db.DAOParam;
 import bignews.myapplication.db.Headline;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -34,4 +35,7 @@ public interface HeadlineDao {
 
     @Query("select * FROM Headline where news_Id = :newsID")
     Single<List<Headline>> findHeadlineByID(String newsID);
+
+    @Query("select * FROM Headline where isFavorite = 1 order by news_Time desc limit :limit offset :offset")
+    Single<List<Headline>> findHeadlineByFavorite(int offset, int limit);
 }

@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import bignews.myapplication.db.dao.HeadlineDao;
 import io.reactivex.SingleObserver;
@@ -35,6 +36,13 @@ public class DAOTest {
     public void createDb() {
         Context context = InstrumentationRegistry.getTargetContext();
         dao = DAO.init(context, Room.inMemoryDatabaseBuilder(context, AppDatabase.class).build());
+        Preferences preferences = dao.getSettings();
+        preferences.isOffline = false;
+        preferences.isNight = false;
+        preferences.onlyText = false;
+        preferences.shieldKeywords = new HashSet<>();
+        preferences.classTags = 0;
+        dao.setSettings(preferences);
     }
     @After
     public void closeDb() throws IOException {
@@ -57,6 +65,12 @@ public class DAOTest {
         assertEquals(news.news_Title, "乐视921邀请函曝光 乐Pro 3悬疑即将揭晓");
         preferences.isOffline = false;
         dao.setSettings(preferences);
+    }
+
+    @Test
+    public void speedTest() throws Exception {
+        dao.getHeadlineList(DAOParam.fromCategory(1, 0, 10)).subscribe();
+        dao.getHeadlineList(DAOParam.fromCategory(1, 10, 10)).subscribe();
     }
 
     @Test
@@ -102,10 +116,16 @@ public class DAOTest {
         Headline headline = dao.getHeadline(DAOParam.fromNewsId("201609130413080e91293fb5402b80437a65970fcb7d")).blockingGet();
         Log.i(TAG, "star: "+headline);
         assertEquals(headline.news_Title, "乐视921邀请函曝光 乐Pro 3悬疑即将揭晓");
+
+        // get favorites (empty).
         ArrayList<Headline> headlines = dao.getHeadlineList(DAOParam.fromCategory(DAOParam.FAVORITE, 0, 10)).blockingGet();
         assertEquals(headlines.size(), 0);
+
+        // Star one piece of news
         dao.star(headline.news_ID).subscribe();
         Log.i(TAG, "star: all headlines="+dao.getHeadlineDao().getAll().blockingGet());
+
+        // get favorites (one item)
         headlines = dao.getHeadlineList(DAOParam.fromCategory(DAOParam.FAVORITE, 0, 10)).blockingGet();
         assertEquals(headlines.size(), 1);
 
@@ -113,6 +133,9 @@ public class DAOTest {
         dao.unStar(headline.news_ID).subscribe();
         headlines = dao.getHeadlineList(DAOParam.fromCategory(DAOParam.FAVORITE, 0, 10)).blockingGet();
         assertEquals(headlines.size(), 0);
+
+        headline = dao.getHeadline(DAOParam.fromNewsId(headline.news_ID)).blockingGet();
+        assertEquals(false, headline.isFavorite);
     }
 
     @Test
@@ -125,4 +148,16 @@ public class DAOTest {
 
     }
 
+    @Test
+    public void setSettings() throws Exception {
+
+        Preferences preferences = dao.getSettings();
+        Log.i(TAG, "setSettings: "+preferences);
+        int before = preferences.classTags;
+        preferences.classTags += 1;
+        assertEquals(dao.setSettings(preferences), true);
+        preferences = dao.getSettings();
+        Log.i(TAG, "setSettings: "+preferences);
+        assertEquals(preferences.classTags, before + 1);
+    }
 }
