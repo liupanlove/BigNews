@@ -53,5 +53,5 @@ dependencies {
     testCompile "android.arch.persistence.room:testing:1.0.0-alpha9"
     testCompile 'junit:junit:4.12'
     compile 'com.squareup.okhttp3:okhttp:3.8.0'
-    testCompile 'com.squareup.okhttp3:mockwebserver:3.8.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
 }

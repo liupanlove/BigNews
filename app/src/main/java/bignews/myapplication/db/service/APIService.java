@@ -17,20 +17,25 @@ import retrofit2.http.Query;
 
 public interface APIService {
     @GET("latest")//?pageNo={pageNO}&pageSize={pageSize}&category={category}")
-    Single<HeadlineResponse> loadHeadlines(@Query("pageNo") int pageNo,
-                                              @Query("pageSize") int pageSize,
-                                              @Query("category") int category);
+    Single<HeadlineResponse> loadHeadlines(@Query("pageNo") Integer pageNo,
+                                              @Query("pageSize") Integer pageSize,
+                                              @Query("category") Integer category);
     @GET("search")//?keyword={keyword}&pageNo={pageNo}&pageSize={pageSize}&category={category}")
-    Single<HeadlineResponse> loadHeadlines(@Query("pageNo") int pageNo,
-                                              @Query("pageSize") int pageSize,
-                                              @Query("category") int category,
+    Single<HeadlineResponse> loadHeadlines(@Query("pageNo") Integer pageNo,
+                                              @Query("pageSize") Integer pageSize,
+                                              @Query("category") Integer category,
                                               @Query("keyword") String keyword);
     @GET("detail")//?newsId={newsId}")
     Single<News> loadNews(@Query("newsId") String newsID);
 
 
     @GET("latest")//?pageNo={pageNO}&pageSize={pageSize}&category={category}")
-    Call<ResponseBody> loadHeadlines_okhttp(@Query("pageNo") int pageNo,
-                                     @Query("pageSize") int pageSize,
-                                     @Query("category") int category);
+    Call<ResponseBody> loadHeadlines_okhttp(@Query("pageNo") Integer pageNo,
+                                     @Query("pageSize") Integer pageSize,
+                                     @Query("category") Integer category);
+    @GET("search")//?keyword={keyword}&pageNo={pageNo}&pageSize={pageSize}&category={category}")
+    Call<ResponseBody> loadHeadlines_okhttp(@Query("pageNo") Integer pageNo,
+                                           @Query("pageSize") Integer pageSize,
+                                           @Query("category") Integer category,
+                                           @Query("keyword") String keyword);
 }

@@ -8,8 +8,20 @@ import android.arch.persistence.room.PrimaryKey;
  */
 @Entity
 public class Keyword {
-    @PrimaryKey
-    public Integer id;
+    public Keyword(String word, Double score) {
+        this.score = score;
+        this.word = word;
+    }
+
+    @Override
+    public String toString() {
+        return "Keyword{" +
+                "score=" + score +
+                ", word='" + word + '\'' +
+                '}';
+    }
+
     public Double score;
-    public String text;
+    @PrimaryKey
+    public String word;
 }

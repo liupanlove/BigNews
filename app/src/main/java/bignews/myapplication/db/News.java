@@ -16,10 +16,13 @@ public class News extends Headline {
     public ArrayList<String> seggedPListOfContent;
     //ArrayList<String> persons;
     @Ignore
-    public ArrayList<Pair<String, Double>> keywords;
+    public ArrayList<Keyword> Keywords;
 
     @Override
     public String toString() {
-        return "News{"+super.toString()+"}";
+        return "News{" +
+                super.toString() +
+                "Keywords=" + Keywords +
+                '}';
     }
 }

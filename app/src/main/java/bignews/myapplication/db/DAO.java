@@ -1,10 +1,7 @@
 package bignews.myapplication.db;
 
-import android.app.Application;
-import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Room;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -85,6 +82,18 @@ public class DAO {
         return dao;
     }
 
+
+    Single<Headline> getHeadline(DAOParam param) {
+        return headlineDao.findHeadlineByID(param.newsID)
+                .map(new Function<List<Headline>, Headline>() {
+                    @Override
+                    public Headline apply(@NonNull List<Headline> headlines) throws Exception {
+                        if (headlines.size() == 0) throw new RuntimeException("No such headline.");
+                        return headlines.get(0);
+                    }
+                });
+    }
+
     /**
      * Get news body.
      * @param param parameter
@@ -92,40 +101,57 @@ public class DAO {
      */
     public Single<News> getNews(final DAOParam param)
     {
-        return getSettings().isOffline //TODO: optimize
+        return (getSettings().isOffline //TODO: optimize
                 ? newsDao.findByID(param.newsID)
                 .map(new Function<List<News>, News>() { // workaround
                     @Override
                     public News apply(@NonNull List<News> newses) throws Exception {
+                        if (newses.size() == 0) throw new RuntimeException("No such news.");
                         return newses.get(0);
                     }
                 })
-                : APICaller.getInstance().loadNews(param)
-                /*.map(new Function<News, News>() {
+                : (APICaller.getInstance().loadNews(param)
+                .map(new Function<News, News>() {
                     @Override
                     public News apply(@NonNull News news) throws Exception {
-
+                        newsDao.addNews(news);
                         return news;
                     }
-                }))*/; // image?
+                })))
+                .map(new Function<News, News>() {//TODO: Strange
+                    @Override
+                    public News apply(@NonNull News news) throws Exception {
+                        for (Keyword keyword:
+                                news.Keywords) {
+                            List<Keyword> keywords = keywordDao.findKeywordByText(keyword.word).blockingGet();
+                            Keyword newKeyword = new Keyword(keyword.word, keyword.score);
+                            if (keywords.size() != 0) newKeyword.score += keywords.get(0).score;
+                            keywordDao.addKeyword(newKeyword);
+                        }
+                        return news;
+                    }
+                }); //TODO: image? 词条 add news, Keywords to database
 
     }
 
     /**
      * Get headline list.
-     * User can specify @link{DAOParam#category}, @link{DAOParam#keywords}, @link{DAOParam#mode}
+     * User can specify @link{DAOParam#category}, @link{DAOParam#Keywords}, @link{DAOParam#mode}
      * and so on.
      * @param param parameter
      * @return An ArrayList containing the headlines
      */
     public Single<ArrayList<Headline>> getHeadlineList(final DAOParam param)
     {
-        return ((getSettings().isOffline || param.category == DAOParam.FAVORITE) //TODO: class RECOMMENDATION
+        return ((param.keywords == null)
+        ? (((getSettings().isOffline || param.category == DAOParam.FAVORITE) //TODO: class RECOMMENDATION
             ? headlineDao.load(classTags.get(param.category), param.offset, param.limit)
-            : APICaller.getInstance().loadHeadlines(param))
+            : APICaller.getInstance().loadHeadlines(param)))
+        : APICaller.getInstance().searchHeadlines(param))
                 .map(new Function<List<Headline>, ArrayList<Headline>>() {// check if visited
                     @Override
                     public ArrayList<Headline> apply(@NonNull List<Headline> headlines) throws Exception {
+                        Log.i(TAG, "apply: getHeadlineList");
                         for (Headline headline : headlines)
                             headline.isVisited = !newsDao.findByID(headline.news_ID)
                                     .blockingGet().isEmpty();
@@ -136,7 +162,7 @@ public class DAO {
                     @Override
                     public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines) throws Exception {
                         for (Headline headline : headlines)
-                            headlineDao.addHeadline(headline); // TODO: unit test
+                            headlineDao.addHeadline(headline);
                         return headlines;
                     }
                 });
@@ -180,19 +206,19 @@ public class DAO {
         return Completable.fromRunnable(new Runnable() {
             @Override
             public void run() {
-                Headline headline = (Headline)(getNews(DAOParam.fromNewsId(newsID)).blockingGet()); //TODO: find from Headline database
+                Headline headline = getHeadline(DAOParam.fromNewsId(newsID)).blockingGet();
                 headline.newsClassTag = classTags.get(DAOParam.FAVORITE);
                 headlineDao.addHeadline(headline);
-                Log.i(TAG, "run: star "+newsID);
+                Log.i(TAG, "run: star begin "+newsID);
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                Log.i(TAG, "run: star end "+newsID);
             }
         });
     }
-
     /**
      * Remove a piece of news from favorites
      * @param newsID news ID
@@ -201,7 +227,7 @@ public class DAO {
         return Completable.fromRunnable(new Runnable() {
             @Override
             public void run() {
-                Headline headline = (Headline)(newsDao.findByID(newsID).blockingGet().get(0));//TODO: find from Headline database
+                Headline headline = getHeadline(DAOParam.fromNewsId(newsID)).blockingGet();
                 headlineDao.deleteHeadline(headline);
             }
         });

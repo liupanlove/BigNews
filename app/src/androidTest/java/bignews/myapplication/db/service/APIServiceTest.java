@@ -9,6 +9,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 
 import bignews.myapplication.db.Headline;
 import bignews.myapplication.utils.Tools;
@@ -16,6 +18,7 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -79,24 +82,22 @@ public class APIServiceTest {
     @Before
     public void init()
     {
-        final OkHttpClient client = new OkHttpClient();
-        //client.interceptors().add(new FakeInterceptor());
-        retrofit = new Retrofit.Builder()
-                .baseUrl("http://166.111.68.66:2042/news/action/query/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                //.client(client)
-                .build();
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+        retrofit = Tools.getRetrofit();
     }
     @Test
     public void gsonTest() throws Exception {
         String response = "{\"list\":[{\"lang_Type\":\"zh-CN\",\"newsClassTag\":\"科技\",\"news_Author\":\"创事记 微博 作者： 广州阿超\",\"news_ID\":\"20160913041301d5fc6a41214a149cd8a0581d3a014f\",\"news_Pictures\":\"\",\"news_Source\":\"新浪新闻\",\"news_Time\":\"20160912000000\",\"news_Title\":\"iPhone 7归来，友商们吊打苹果的姿势正确吗？\",\"news_URL\":\"http://tech.sina.com.cn/zl/post/detail/mobile/2016-09-12/pid_8508491.htm\",\"news_Video\":\"\",\"news_Intro\":\"　　欢迎关注“创事记”的微信订阅号：sinachuangshiji 文/罗超...\"},{\"lang_Type\":\"zh-CN\",\"newsClassTag\":\"科技\",\"news_Author\":\"环球网\",\"news_ID\":\"201609130413080e91293fb5402b80437a65970fcb7d\",\"news_Pictures\":\"http://himg2.huanqiu.com/attachment2010/2016/0912/13/16/20160912011621140.png;http://himg2.huanqiu.com/attachment2010/2016/0912/13/16/20160912011630240.png;http://himg2.huanqiu.com/attachment2010/2016/0912/13/16/20160912011642992.png;http://himg2.huanqiu.com/attachment2010/2016/0912/13/16/20160912011655316.png;http://himg2.huanqiu.com/attachment2010/2016/0912/13/17/20160912011703267.png;http://himg2.huanqiu.com/statics/images/more-icoCopy.png\",\"news_Source\":\"环球网\",\"news_Time\":\"20160912000000\",\"news_Title\":\"乐视921邀请函曝光 乐Pro 3悬疑即将揭晓\",\"news_URL\":\"http://tech.huanqiu.com/diginews/2016-09/9432234.html\",\"news_Video\":\"\",\"news_Intro\":\"乐视921邀请函曝光 乐Pro 3悬疑即将揭晓 2016-09-12 13:...\"},{\"lang_Type\":\"zh-CN\",\"newsClassTag\":\"科技\",\"news_Author\":\"中国网\",\"news_ID\":\"201609130413037a073b2cdb4768aff90eff46f2665b\",\"news_Pictures\":\"http://imge.gmw.cn/attachement/png/site2/20160912/f44d305ea5951940d3fd4f.png;http://imge.gmw.cn/attachement/png/site2/20160912/f44d305ea5951940d3fd50.png;http://imge.gmw.cn/attachement/png/site2/20160912/f44d305ea5951940d3fd51.png;http://imge.gmw.cn/attachement/png/site2/20160912/f44d305ea5951940d3fd52.png;http://imge.gmw.cn/attachement/png/site2/20160912/f44d305ea5951940d3fd53.png\",\"news_Source\":\"光明网\",\"news_Time\":\"20160912000000\",\"news_Title\":\"吴亦凡亮相荣耀极光派对 全新定义不凡潮品荣耀8\",\"news_URL\":\"http://e.gmw.cn/2016-09/12/content_21944565.htm\",\"news_Video\":\"\",\"news_Intro\":\"　　9月9日，一场科技撞击潮流的派对在北京举行。荣耀品牌携手吴亦凡华丽亮相荣...\"},{\"lang_Type\":\"zh-CN\",\"newsClassTag\":\"科技\",\"news_Author\":\"\",\"news_ID\":\"2016091304131a39c78c43b047b6b64b7a13abc81305\",\"news_Pictures\":\"\",\"news_Source\":\"金融界\",\"news_Time\":\"20160912000000\",\"news_Title\":\"税网用上新技术 用户体验“蛮好咯”\",\"news_URL\":\"http://finance.jrj.com.cn/2016/09/12145021447520.shtml\",\"news_Video\":\"\",\"news_Intro\":\"　　近日,从事代理记账工作的小王用手机浏览上海税务网,突然发现变化很大:阅读...\"},{\"lang_Type\":\"zh-CN\",\"newsClassTag\":\"科技\",\"news_Author\":\"环球网\",\"news_ID\":\"2016091304131732ac05cc9d4c41bd93856dfa85509c\",\"news_Pictures\":\"http://upload.qianlong.com/2016/0912/1473646149318.jpeg http://upload.qianlong.com/2016/0912/1473674371218.jpeg\",\"news_Source\":\"其他\",\"news_Time\":\"20160912000000\",\"news_Title\":\"美运营商重启对苹果手机补贴 iPhone 6换iPhone 7\",\"news_URL\":\"http://tech.qianlong.com/2016/0912/923008.shtml\",\"news_Video\":\"\",\"news_Intro\":\"据美国《华尔街日报》9月12日报道，美国移动运营商花费了数年时间才推动用户以...\"},{\"lang_Type\":\"zh-CN\",\"newsClassTag\":\"科技\",\"news_Author\":\"中国新闻网\",\"news_ID\":\"20160913041320c710ffede54b4fbdb45e8e61388171\",\"news_Pictures\":\"\",\"news_Source\":\"其他\",\"news_Time\":\"20160912000000\",\"news_Title\":\"iPhone7遭吐槽 网友称买天价机不如出国旅游\",\"news_URL\":\"http://news.dayoo.com/society/201609/12/140000_50211513.htm\",\"news_Video\":\"\",\"news_Intro\":\"日盼夜盼，全球果粉们终于盼来了9月7日iPhone7的正式发布。然而iPho...\"},{\"lang_Type\":\"zh-CN\",\"newsClassTag\":\"科技\",\"news_Author\":\"环球网\",\"news_ID\":\"2016091304130bb6d594c82e47a7a5b088602f8fb912\",\"news_Pictures\":\"http://upload.qianlong.com/2016/0912/1473642904882.jpg\",\"news_Source\":\"其他\",\"news_Time\":\"20160912000000\",\"news_Title\":\"网曝10万部锤子T3全部返厂 官方愤怒否认\",\"news_URL\":\"http://tech.qianlong.com/2016/0912/922107.shtml\",\"news_Video\":\"\",\"news_Intro\":\"各大手机厂商热热闹闹轮番发布新品，罗永浩的锤子却异常淡定，新旗舰T3迟迟不来...\"},{\"lang_Type\":\"zh-CN\",\"newsClassTag\":\"科技\",\"news_Author\":\"京华时报\",\"news_ID\":\"2016091304130b71f06f6a924b148ee113eea5bb2d97\",\"news_Pictures\":\"\",\"news_Source\":\"新华网\",\"news_Time\":\"20160912000000\",\"news_Title\":\"三星手机频“爆炸” 美官方发布警告 建议停用\",\"news_URL\":\"http://sh.xinhuanet.com/2016-09/12/c_135681414.htm\",\"news_Video\":\"\",\"news_Intro\":\"　　 据新华社电美国消费产品安全委员会9日发布消费者警告，敦促停止使用三星盖...\"},{\"lang_Type\":\"zh-CN\",\"newsClassTag\":\"科技\",\"news_Author\":\"新浪网\",\"news_ID\":\"2016091304132a94c8ed99814a0ab3546612e762939c\",\"news_Pictures\":\"\",\"news_Source\":\"其他\",\"news_Time\":\"20160912000000\",\"news_Title\":\"三星召回Note 7后续：备用机是入门级Galaxy J系列\",\"news_URL\":\"http://tech.qianlong.com/2016/0912/921578.shtml\",\"news_Video\":\"\",\"news_Intro\":\"目前，三星正在多个国家和地区召回电池有爆炸隐患的Galaxy Note 7，...\"},{\"lang_Type\":\"zh-CN\",\"newsClassTag\":\"科技\",\"news_Author\":\"\",\"news_ID\":\"20160913041321ba5bd225b24a95a193bf01aad928f9\",\"news_Pictures\":\"\",\"news_Source\":\"金融界\",\"news_Time\":\"20160912000000\",\"news_Title\":\"李彦宏剑桥演讲再谈“下一幕”：人工智能将颠覆更多行业\",\"news_URL\":\"http://finance.jrj.com.cn/tech/2016/09/12100321445659.shtml\",\"news_Video\":\"\",\"news_Intro\":\"　　李彦宏认为移动互联网的时代正在成为过去，今年以来，互联网开启了“人工智能...\"}],\"pageNo\":1,\"pageSize\":10,\"totalPages\":2947,\"totalRecords\":29467}";
-        HeadlineResponse hlr = new Gson().fromJson(response, HeadlineResponse.class);
+        HeadlineResponse hlr = Tools.getGson().fromJson(response, HeadlineResponse.class);
         assertNotNull("HeadlineResponse is NULL", hlr);
         assertNotNull("Headlines is NULL", hlr.headlines);
         Headline first = hlr.headlines.get(0);
+        Log.i(TAG, "gsonTest: "+first);
         assertEquals(first.news_ID, "20160913041301d5fc6a41214a149cd8a0581d3a014f");
-        Log.i(TAG, "gsonTest: "+hlr.headlines);
+        //assertEquals(first.news_Time, new SimpleDateFormat("yyyyMMddhhmmss").parse("20160912000000"));
     }
     @Test
     public void loadHeadlines_okhttp() throws Exception {
@@ -117,12 +118,29 @@ public class APIServiceTest {
                 .loadHeadlines(1, 10, 1)
                 .blockingGet();
         for (Headline hl : response.headlines)
-            Log.d(TAG, "accept: "+hl);
+            Log.d(TAG, "loadHeadlines: "+hl);
     }
 
     @Test
-    public void loadHeadlines1() throws Exception {
+    public void searchHeadlines() throws Exception {
+        HeadlineResponse response = retrofit.create(APIService.class)
+                .loadHeadlines(1, 10, null, "浙江 江苏")
+                .blockingGet();
+        Log.i(TAG, "searchHeadlines: response="+response);
+        for (Headline hl : response.headlines)
+            Log.d(TAG, "searchHeadlines: "+hl);
 
+
+    }
+    @Test
+    public void searchHeadlines_okhttp() throws Exception {
+        Call<ResponseBody> call = retrofit.create(APIService.class)
+                .loadHeadlines_okhttp(1, 10, null, "浙江 江苏");
+        retrofit2.Response<ResponseBody> body = call.execute();
+        String res = body.body().string();
+        Log.i(TAG, "searchHeadlines_okhttp: "+res);
+        HeadlineResponse hlr = Tools.getGson().fromJson(res, HeadlineResponse.class);
+        Log.i(TAG, "searchHeadlines_okhttp: "+hlr);
     }
 
     @Test
