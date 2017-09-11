@@ -20,10 +20,10 @@ import io.reactivex.Single;
  */
 @Dao
 public interface HeadlineDao {
-    @Query("select * FROM Headline")
+    @Query("select * FROM Headline order by news_Time")
     Single<List<Headline>> getAll();
 
-    @Query("select * from Headline where newsClassTag = :newsClassTag limit :limit offset :offset")
+    @Query("select * from Headline where newsClassTag = :newsClassTag  order by news_Time desc limit :limit offset :offset")
     Single<List<Headline>> load(String newsClassTag, int offset, int limit);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -31,4 +31,7 @@ public interface HeadlineDao {
 
     @Delete()
     void deleteHeadline(Headline headline);
+
+    @Query("select * FROM Headline where news_Id = :newsID")
+    Single<List<Headline>> findHeadlineByID(String newsID);
 }

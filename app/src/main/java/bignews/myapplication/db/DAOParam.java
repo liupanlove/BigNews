@@ -12,7 +12,7 @@ public class DAOParam {
      */
     public int category;
     /**
-     * News keywords
+     * News Keywords
      */
     public String keywords;
     /**
@@ -36,7 +36,7 @@ public class DAOParam {
     }
     /**
      * Text Mode or Normal Mode
-     * Match or shield keywords
+     * Match or shield Keywords
      */
     public int mode;
 
