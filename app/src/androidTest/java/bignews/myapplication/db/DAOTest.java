@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import bignews.myapplication.db.dao.HeadlineDao;
+import io.reactivex.SingleObserver;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 
 import static org.junit.Assert.*;
@@ -71,16 +73,32 @@ public class DAOTest {
                         return headlines;
                     }
                 })
-                .repeat(4)
+                .repeat(3)
                 .blockingLast();
         Log.i(TAG, "getHeadlineList: get All News="+dao.getNewsDao().getAll().blockingGet());
         Log.i(TAG, "getHeadlineList: headlinefirst="+headlines.get(0));
         assertEquals(headlines.get(0).isVisited, true);
+
+        headlines = dao.getHeadlineList(DAOParam.fromKeyword("杭州 江苏", 0, 10))
+                .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {
+                    @Override
+                    public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines) throws Exception {
+                        Log.i(TAG, "apply: getHeadlineList");
+                        for (Headline headline :
+                                headlines) {
+                            dao.getNews(DAOParam.fromNewsId(headline.news_ID)).subscribe();
+                        }
+                        return headlines;
+                    }
+                })
+                .repeat(3)
+                .blockingLast();
+        Log.i(TAG, "getHeadlineList: headline="+headlines);
     }
 
     @Test
     public void star() throws Exception {
-        dao.getHeadlineList(DAOParam.fromCategory(1, 0, 10)).repeat(5).subscribe();
+        dao.getHeadlineList(DAOParam.fromCategory(1, 0, 10)).repeat(5).blockingSubscribe();
         Headline headline = dao.getHeadline(DAOParam.fromNewsId("201609130413080e91293fb5402b80437a65970fcb7d")).blockingGet();
         Log.i(TAG, "star: "+headline);
         assertEquals(headline.news_Title, "乐视921邀请函曝光 乐Pro 3悬疑即将揭晓");

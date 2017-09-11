@@ -10,7 +10,7 @@ public class DAOParam {
     /**
      * News category [-1-12], zero means recommendation, -1 means Favorites
      */
-    public int category;
+    public Integer category;
     /**
      * News Keywords
      */
@@ -42,12 +42,32 @@ public class DAOParam {
 
     public DAOParam() {}
 
-    public static DAOParam fromCategory(int category, int offset, int limit) {
+    public static DAOParam fromKeyword(String keywords, Integer offset, Integer limit) {
+        DAOParam dp = new DAOParam();
+        dp.keywords = keywords;
+        dp.offset = offset;
+        dp.limit = limit;
+        return dp;
+    }
+
+    public static DAOParam fromCategory(Integer category, Integer offset, Integer limit) {
         DAOParam dp = new DAOParam();
         dp.category = category;
         dp.offset = offset;
         dp.limit = limit;
         return dp;
+    }
+
+    @Override
+    public String toString() {
+        return "DAOParam{" +
+                "category=" + category +
+                ", keywords='" + keywords + '\'' +
+                ", newsID='" + newsID + '\'' +
+                ", offset=" + offset +
+                ", limit=" + limit +
+                ", mode=" + mode +
+                '}';
     }
 
     public static DAOParam fromNewsId(String newsID) {

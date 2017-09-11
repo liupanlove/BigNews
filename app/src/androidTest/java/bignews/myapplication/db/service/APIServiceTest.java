@@ -18,6 +18,7 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -81,14 +82,10 @@ public class APIServiceTest {
     @Before
     public void init()
     {
-        final OkHttpClient client = new OkHttpClient();
-        //client.interceptors().add(new FakeInterceptor());
-        /*retrofit = new Retrofit.Builder()
-                .baseUrl("http://166.111.68.66:2042/news/action/query/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                //.client(client)
-                .build();*/
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
         retrofit = Tools.getRetrofit();
     }
     @Test
@@ -100,7 +97,7 @@ public class APIServiceTest {
         Headline first = hlr.headlines.get(0);
         Log.i(TAG, "gsonTest: "+first);
         assertEquals(first.news_ID, "20160913041301d5fc6a41214a149cd8a0581d3a014f");
-        assertEquals(first.news_Time, new SimpleDateFormat("yyyyMMddhhmmss").parse("20160912000000"));
+        //assertEquals(first.news_Time, new SimpleDateFormat("yyyyMMddhhmmss").parse("20160912000000"));
     }
     @Test
     public void loadHeadlines_okhttp() throws Exception {
@@ -121,12 +118,29 @@ public class APIServiceTest {
                 .loadHeadlines(1, 10, 1)
                 .blockingGet();
         for (Headline hl : response.headlines)
-            Log.d(TAG, "accept: "+hl);
+            Log.d(TAG, "loadHeadlines: "+hl);
     }
 
     @Test
-    public void loadHeadlines1() throws Exception {
+    public void searchHeadlines() throws Exception {
+        HeadlineResponse response = retrofit.create(APIService.class)
+                .loadHeadlines(1, 10, null, "浙江 江苏")
+                .blockingGet();
+        Log.i(TAG, "searchHeadlines: response="+response);
+        for (Headline hl : response.headlines)
+            Log.d(TAG, "searchHeadlines: "+hl);
 
+
+    }
+    @Test
+    public void searchHeadlines_okhttp() throws Exception {
+        Call<ResponseBody> call = retrofit.create(APIService.class)
+                .loadHeadlines_okhttp(1, 10, null, "浙江 江苏");
+        retrofit2.Response<ResponseBody> body = call.execute();
+        String res = body.body().string();
+        Log.i(TAG, "searchHeadlines_okhttp: "+res);
+        HeadlineResponse hlr = Tools.getGson().fromJson(res, HeadlineResponse.class);
+        Log.i(TAG, "searchHeadlines_okhttp: "+hlr);
     }
 
     @Test

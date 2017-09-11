@@ -143,9 +143,11 @@ public class DAO {
      */
     public Single<ArrayList<Headline>> getHeadlineList(final DAOParam param)
     {
-        return ((getSettings().isOffline || param.category == DAOParam.FAVORITE) //TODO: class RECOMMENDATION
+        return ((param.keywords == null)
+        ? (((getSettings().isOffline || param.category == DAOParam.FAVORITE) //TODO: class RECOMMENDATION
             ? headlineDao.load(classTags.get(param.category), param.offset, param.limit)
-            : APICaller.getInstance().loadHeadlines(param))
+            : APICaller.getInstance().loadHeadlines(param)))
+        : APICaller.getInstance().searchHeadlines(param))
                 .map(new Function<List<Headline>, ArrayList<Headline>>() {// check if visited
                     @Override
                     public ArrayList<Headline> apply(@NonNull List<Headline> headlines) throws Exception {

@@ -14,4 +14,10 @@ public class HeadlineResponse {
     @SerializedName("list")
     public ArrayList<Headline> headlines;
 
+    @Override
+    public String toString() {
+        return "HeadlineResponse{" +
+                "headlines=" + headlines +
+                '}';
+    }
 }

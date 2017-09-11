@@ -17,16 +17,17 @@ public class Headline {
     public String newsClassTag, news_Category, news_Source, news_Title, news_URL, news_Author, lang_Type,
             news_Pictures, news_Video, news_Intro;
     @TypeConverters({Converters.class})
-    public Date news_Time;
+    public String news_Time;
     @Ignore
     public boolean isVisited;
 
     @Override
     public String toString() {
         return "Headline{" +
-                "news_Title='" + news_Title + '\'' +
-                "newsClassTag='" + newsClassTag + '\'' +
-                "news_Time='" + news_Time + '\'' +
+                "news_ID='" + news_ID + '\'' +
+                ", newsClassTag='" + newsClassTag + '\'' +
+                ", news_Title='" + news_Title + '\'' +
+                ", isVisited=" + isVisited +
                 '}';
     }
 }
