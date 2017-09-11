@@ -3,6 +3,7 @@ package bignews.myapplication.db;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import bignews.myapplication.db.service.APIService;
 import bignews.myapplication.db.service.HeadlineResponse;
@@ -30,7 +31,7 @@ public class APICaller {
                 .create(APIService.class)
                 .loadNews(param.newsID);
     }
-    Single<ArrayList<Headline>> loadHeadlines(final DAOParam param) {
+    Single<List<Headline>> loadHeadlines(final DAOParam param) {
         return Tools.getRetrofit()
                 .create(APIService.class)
                 .loadHeadlines(1, param.limit + param.offset, param.category)
@@ -48,16 +49,16 @@ public class APICaller {
                         return headlineResponse;
                     }
                 })*/
-                .flattenAsObservable(new Function<HeadlineResponse, ArrayList<Headline>>() {
+                .flattenAsObservable(new Function<HeadlineResponse, List<Headline>>() {
                     @Override
-                    public ArrayList<Headline> apply(@NonNull HeadlineResponse headlineResponse) throws Exception {
+                    public List<Headline> apply(@NonNull HeadlineResponse headlineResponse) throws Exception {
                         return headlineResponse.headlines;
                     }
                 })
                 .skip(param.offset)
-                .reduce(new ArrayList<Headline>(), new BiFunction<ArrayList<Headline>, Headline, ArrayList<Headline>>() {
+                .reduce(new ArrayList<Headline>(), new BiFunction<List<Headline>, Headline, List<Headline>>() {
                     @Override
-                    public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines, @NonNull Headline headline) throws Exception {
+                    public List<Headline> apply(@NonNull List<Headline> headlines, @NonNull Headline headline) throws Exception {
                         headlines.add(headline);
                         return headlines;
                     }
@@ -67,23 +68,23 @@ public class APICaller {
                 //subList(param.offset, param.offset + param.limit);
     }
 
-    Single<ArrayList<Headline>> searchHeadlines(DAOParam param) {
+    Single<List<Headline>> searchHeadlines(DAOParam param) {
         return Tools.getRetrofit()
                 .create(APIService.class)
                 .loadHeadlines(1, param.limit + param.offset, param.category, param.keywords)
-                .flattenAsObservable(new Function<HeadlineResponse, ArrayList<Headline>>() {
+                .flattenAsObservable(new Function<HeadlineResponse, List<Headline>>() {
                     public static final String TAG = "searchHeadlines";
 
                     @Override
-                    public ArrayList<Headline> apply(@NonNull HeadlineResponse headlineResponse) throws Exception {
+                    public List<Headline> apply(@NonNull HeadlineResponse headlineResponse) throws Exception {
                         Log.i(TAG, "apply: "+headlineResponse);
                         return headlineResponse.headlines;
                     }
                 })
                 .skip(param.offset)
-                .reduce(new ArrayList<Headline>(), new BiFunction<ArrayList<Headline>, Headline, ArrayList<Headline>>() {
+                .reduce(new ArrayList<Headline>(), new BiFunction<List<Headline>, Headline, List<Headline>>() {
                     @Override
-                    public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines, @NonNull Headline headline) throws Exception {
+                    public List<Headline> apply(@NonNull List<Headline> headlines, @NonNull Headline headline) throws Exception {
                         headlines.add(headline);
                         return headlines;
                     }

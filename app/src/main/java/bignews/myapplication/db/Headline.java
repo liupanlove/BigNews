@@ -18,8 +18,7 @@ public class Headline {
             news_Pictures, news_Video, news_Intro;
     @TypeConverters({Converters.class})
     public String news_Time;
-    @Ignore
-    public boolean isVisited;
+    public boolean isFavorite;
 
     @Override
     public String toString() {
@@ -27,7 +26,12 @@ public class Headline {
                 "news_ID='" + news_ID + '\'' +
                 ", newsClassTag='" + newsClassTag + '\'' +
                 ", news_Title='" + news_Title + '\'' +
+                ", isFavorite=" + isFavorite +
                 ", isVisited=" + isVisited +
                 '}';
     }
+
+    @Ignore
+    public boolean isVisited;
+
 }
