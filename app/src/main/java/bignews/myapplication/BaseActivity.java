@@ -1,6 +1,7 @@
 package bignews.myapplication;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
+import android.app.UiModeManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,19 +36,49 @@ import java.util.Vector;
 class ConfigStruct {
     public boolean picture_mode;
     public boolean day_mode;
-    public boolean class_list_deleting;
-    public boolean shield_list_deleting;
     public boolean class_changed;
+    public Vector<Integer> tag_id_list;
+    public Vector<String> tag_list;
     public Vector<String> class_data;
-    public Vector<String> shield_data;
+    public Vector<Boolean> class_use;
     public ConfigStruct() {
+        Log.v("Err","fuck");
         picture_mode = true;
         day_mode = true;
-        class_list_deleting = false;
-        shield_list_deleting = false;
         class_changed = false;
-        class_data = ConfigActivity.getClasses();
-        shield_data = ConfigActivity.getShields();
+        class_data = new Vector<>();
+        class_data.add("科技");
+        class_data.add("教育");
+        class_data.add("军事");
+        class_data.add("国内");
+        class_data.add("社会");
+        class_data.add("文化");
+        class_data.add("汽车");
+        class_data.add("国际");
+        class_data.add("体育");
+        class_data.add("财经");
+        class_data.add("健康");
+        class_data.add("娱乐");
+        class_use = new Vector<>();
+        for (int i = 0; i < 12; ++i)
+            class_use.add(true);
+        tag_id_list = new Vector<>();
+        tag_list = new Vector<>();
+        refresh_tag_list();
+    }
+
+    public void refresh_tag_list() {
+        tag_list.clear();
+        tag_id_list.clear();
+        tag_id_list.add(-1);
+        tag_id_list.add(0);
+        tag_list.add("主页");
+        tag_list.add("推荐");
+        for (int i = 0; i < 12; ++i)
+            if (class_use.get(i)) {
+                tag_id_list.add(i);
+                tag_list.add(class_data.get(i));
+            }
     }
 }
 
@@ -57,6 +89,7 @@ public class BaseActivity extends AppCompatActivity {
     private Toolbar toolBar;
     private Intent config_intent;
     final static public ConfigStruct config_struct = new ConfigStruct();
+    private UiModeManager mUiModeManager = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -40,7 +40,7 @@ public class APICaller {
                     @Override
                     public HeadlineResponse apply(@NonNull HeadlineResponse headlineResponse) throws Exception {
                         headlineResponse.headlines = new ArrayList<Headline>();
-                        for (int i = param.offset; i < param.limit; ++i) {
+                        for (int i = 0; i < param.offset + param.limit; ++i) {
                             Headline headline = new Headline();
                             headline.news_Title = "" + i;
                             headline.news_ID = "" + i;

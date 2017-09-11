@@ -31,8 +31,8 @@ public class MainActivity extends BaseActivity
         for (int i = fragments.size() - 1; i >= 0; --i) {
             String tag = fragments.get(i).getArguments().getString("text");
             boolean got = false;
-            for (int j = 0; j < BaseActivity.config_struct.class_data.size(); ++j)
-                if (BaseActivity.config_struct.class_data.get(j).equals(tag)) {
+            for (int j = 0; j < BaseActivity.config_struct.tag_list.size(); ++j)
+                if (BaseActivity.config_struct.tag_list.get(j).equals(tag)) {
                     got = true;
                     break;
                 }
@@ -41,8 +41,8 @@ public class MainActivity extends BaseActivity
                 fragments.remove(i);
             }
         }
-        for (int i = 0; i < BaseActivity.config_struct.class_data.size(); ++i) {
-            String tag = BaseActivity.config_struct.class_data.get(i);
+        for (int i = 0; i < BaseActivity.config_struct.tag_list.size(); ++i) {
+            String tag = BaseActivity.config_struct.tag_list.get(i);
             boolean got = false;
             for (int j = 0; j < fragments.size(); ++j)
                 if (tag.equals(fragments.get(j).getArguments().getString("text"))) {
@@ -91,15 +91,16 @@ public class MainActivity extends BaseActivity
                         fragments.add(fragment);
                     }
                 });*/
-        for (int i = 0; i < BaseActivity.config_struct.class_data.size(); ++i) {
+        for (int i = 0; i < BaseActivity.config_struct.tag_list.size(); ++i) {
             Fragment fragment = new HeadlinesFragment();
             Bundle bundle = new Bundle();
-            bundle.putString("text",BaseActivity.config_struct.class_data.get(i));
+            bundle.putString("text",BaseActivity.config_struct.tag_list.get(i));
+            bundle.putInt("id",BaseActivity.config_struct.tag_id_list.get(i));
             fragment.setArguments(bundle);
             fragments.add(fragment);
         }
         Log.i(TAG, "onCreate: "+fragments.size());
-        tab_adapter = new TabFragmentAdapter(fragments, BaseActivity.config_struct.class_data, getSupportFragmentManager(), this);
+        tab_adapter = new TabFragmentAdapter(fragments, BaseActivity.config_struct.tag_list, getSupportFragmentManager(), this);
         viewPager.setAdapter(tab_adapter);
         // 初始化
         TabLayout tablayout = (TabLayout) findViewById(R.id.tablayout);
