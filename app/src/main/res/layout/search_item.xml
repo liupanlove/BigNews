@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:orientation = "horizontal">
+    android:orientation = "horizontal"
+    android:background="@color/colorBackground">
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textColor="@android:color/black"
+        android:textColor="@color/colorText"
         android:padding="10px"/>
     <ImageView
         android:id="@+id/image"

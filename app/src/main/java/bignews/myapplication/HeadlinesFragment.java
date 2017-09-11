@@ -44,6 +44,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     DAO dao = DAO.getInstance(); //should be a singleton.
 
     private String mText;
+    private int mID;
 
     @BindView(R.id.listView)
     PullToRefreshListView listView;
@@ -52,21 +53,22 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     OnHeadlineSelectedListener mCallback;
     List<Map<String, Object>> datas = new ArrayList<>();
     private SimpleAdapter adapter;
-    private SingleObserver<? super ArrayList<HeadLine>> subscriber = new SingleObserver<ArrayList<HeadLine>>() {
+    private SingleObserver<? super ArrayList<Headline>> subscriber = new SingleObserver<ArrayList<Headline>>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
             disposable = d;
         }
 
         @Override
-        public void onSuccess(@NonNull ArrayList<HeadLine> strings) {
+        public void onSuccess(@NonNull ArrayList<Headline> strings) {
             news.addAll(strings);
             for(int i = 0; i < strings.size(); ++i)
             {
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("image", R.drawable.home);
-                map.put("title", strings.get(i).newsTitle + "/" + mText);
+                map.put("title", strings.get(i).news_Title + "/" + mText);
                 datas.add(map);
+                Log.v("Err", " " + i);
             }
             adapter.notifyDataSetChanged();
             listView.onRefreshComplete();
@@ -100,12 +102,14 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
     @Override
     public void onCreate(@Nullable Bundle bundle) {
-        Log.i(TAG, "onCreate: "+mText);
+        Log.i("Err", "onCreate: "+mText);
         super.onCreate(bundle);
         if(getArguments()!=null){
             mText = getArguments().getString("text");
+            mID = getArguments().getInt("id");
         }
-        loadNewsData();
+        if (news.size() == 0)
+            loadNewsData();
     }
 
     @Nullable
@@ -153,7 +157,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     }
 
     private void loadNewsData() {//!!!BUG
-        final DAOParam param = DAOParam.fromCategory(Integer.parseInt(mText), news.size(), LIMIT);
+        final DAOParam param = DAOParam.fromCategory(mID, news.size(), LIMIT);
         //news = dao.getHeadlineList(param);
         /*Single.create(new SingleOnSubscribe<ArrayList<Headline>>() {
             @Override

@@ -34,6 +34,7 @@
         android:id="@+id/layout_bottom"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="@color/colorBackgroundGray"
         android:layout_alignParentBottom="true">      <!--表示在容器底部 -->
 
         <LinearLayout

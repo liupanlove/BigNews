@@ -5,7 +5,8 @@
     android:gravity="top"
     android:padding="20px"
     android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    android:background="@color/colorBackground">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="200px"
@@ -31,90 +32,18 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/gray" />
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="新闻类别"
-            android:textSize = "20dp"
-            android:textColor="@android:color/black"/>
-        <EditText
-            android:id="@+id/class_content"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <Button
-            android:id="@+id/class_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="添加"
-            android:backgroundTint="@color/colorPrimary"
-            />
-        <ImageButton
-            android:id="@+id/class_trash"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/trash"
-            android:backgroundTint="#00000000"/>
-    </LinearLayout>
+        android:text="新闻类别"
+        android:textSize = "20dp"
+        android:textColor="@color/colorText"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/gray" />
     <ListView
         android:id="@+id/class_list"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:divider="@color/colorPrimary"
-        android:dividerHeight="1dp"
-        android:headerDividersEnabled="true"
-        android:footerDividersEnabled="true"
-        android:layout_weight="1"></ListView>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/gray" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="屏蔽列表"
-            android:textSize = "20dp"
-            android:textColor="@android:color/black"/>
-        <EditText
-            android:id="@+id/shield_content"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <Button
-            android:id="@+id/shield_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="添加"
-            android:backgroundTint="@color/colorPrimary"
-            />
-        <ImageButton
-            android:id="@+id/shield_trash"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/trash"
-            android:backgroundTint="#00000000"/>
-    </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/gray" />
-    <ListView
-        android:id="@+id/shield_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:divider="@color/colorPrimary"
