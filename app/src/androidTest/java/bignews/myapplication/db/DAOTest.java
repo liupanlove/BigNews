@@ -74,6 +74,25 @@ public class DAOTest {
     }
 
     @Test
+    public void recommendation() throws Exception {
+        dao.getHeadlineList(DAOParam.fromCategory(DAOParam.RECOMMENDATION, 0, 10)).blockingGet();
+        dao.getHeadlineList(DAOParam.fromCategory(1, 0, 10))
+                .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {
+                    @Override
+                    public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines) throws Exception {
+                        Log.i(TAG, "apply: get all news begin");
+                        for (Headline headline :
+                                headlines) {
+                            dao.getNews(DAOParam.fromNewsId(headline.news_ID)).subscribe();
+                        }
+                        Log.i(TAG, "apply: get all news end");
+                        return headlines;
+                    }
+                }).blockingGet();
+        dao.getHeadlineList(DAOParam.fromCategory(DAOParam.RECOMMENDATION, 0, 10)).blockingGet();
+    }
+
+    @Test
     public void getHeadlineList() throws Exception {
         ArrayList<Headline> headlines = dao.getHeadlineList(DAOParam.fromCategory(1, 0, 10))
                 .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {

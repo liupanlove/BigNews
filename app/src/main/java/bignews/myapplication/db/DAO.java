@@ -15,6 +15,7 @@ import bignews.myapplication.db.dao.NewsDao;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.SingleSource;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 
@@ -26,8 +27,8 @@ public class DAO {
     public static HashMap<Integer, String> classTags;
     static {
         classTags = new HashMap<>();
-        classTags.put(DAOParam.FAVORITE, "收藏");
-        classTags.put(DAOParam.RECOMMENDATION, "推荐");
+        //classTags.put(DAOParam.FAVORITE, "收藏");
+        //classTags.put(DAOParam.RECOMMENDATION, "推荐");
         String tmp[] = {"", "科技", "军事", "国内", "社会", "文化", "汽车", "国际", "体育", "财经", "健康", "娱乐"};
         for (int i = 1; i < tmp.length; ++i)
             classTags.put(i, tmp[i]);
@@ -102,28 +103,27 @@ public class DAO {
      */
     public Single<News> getNews(final DAOParam param)
     {
-        Log.i(TAG, "getNews: settings="+getSettings());
-        return (getSettings().isOffline //TODO: optimize
-                ? newsDao.findByID(param.newsID)
-                .map(new Function<List<News>, News>() { // workaround
+        Single<News> fetchFromDB = newsDao.findByID(param.newsID)
+                .map(new Function<List<News>, News>() { // get news. workaround
                     @Override
                     public News apply(@NonNull List<News> newses) throws Exception {
-                        if (newses.size() == 0) throw new RuntimeException("No such news.");
+                        Log.i(TAG, "fetchFromDB: "+newses);
+                        if (newses.size() == 0) throw new NoSuchNewsException();
                         return newses.get(0);
                     }
-                })
-                : (APICaller.getInstance().loadNews(param)
-                .map(new Function<News, News>() {
+                });
+        final Single<News> fetchFromAPI = APICaller.getInstance().loadNews(param)
+                .map(new Function<News, News>() {//add news into database
                     @Override
                     public News apply(@NonNull News news) throws Exception {
+                        Log.i(TAG, "fetchFromAPI: "+news);
                         newsDao.addNews(news);
                         return news;
                     }
-                })))
-                .map(new Function<News, News>() {//TODO: Strange
+                })
+                .map(new Function<News, News>() {//adding keywords //TODO: Strange
                     @Override
                     public News apply(@NonNull News news) throws Exception {
-                        if (news.Keywords != null) //TODO: workaround
                         for (Keyword keyword:
                                 news.Keywords) {
                             List<Keyword> keywords = keywordDao.findKeywordByText(keyword.word).blockingGet();
@@ -133,7 +133,19 @@ public class DAO {
                         }
                         return news;
                     }
-                }); //TODO: image? 词条 add news, Keywords to database
+                });
+        if (getSettings().isOffline)
+            return fetchFromDB;
+        else return
+                fetchFromDB.onErrorResumeNext(new Function<Throwable, SingleSource<? extends News>>() {
+                    @Override
+                    public SingleSource<? extends News> apply(@NonNull Throwable throwable) throws Exception {
+                        Log.i(TAG, "onErrorResumeNext: ", throwable);
+                        return NoSuchNewsException.class.isInstance(throwable)
+                                ? fetchFromAPI
+                                : Single.<News>error(throwable);
+                    }
+                }); //TODO: image? 词条? isFavorite?
 
     }
 
@@ -152,9 +164,17 @@ public class DAO {
         else if (param.category == DAOParam.FAVORITE)
             fetch = headlineDao.findHeadlineByFavorite(param.offset, param.limit);
         else if (param.category == DAOParam.RECOMMENDATION) {
-            //Single<List<Keyword>> highFreq = keywordDao.getHighFreqWord();
-            //fetch = Single.fheadlineDao.findHeadlineByFavorite(param.offset, param.limit);
-            fetch = headlineDao.findHeadlineByFavorite(param.offset, param.limit);
+            final Single<List<Keyword>> highFreq = keywordDao.getHighFreqWord();
+            fetch = highFreq.map(new Function<List<Keyword>, List<Headline>>() {
+                @Override
+                public List<Headline> apply(@NonNull List<Keyword> keywords) throws Exception {
+                    Log.i(TAG, "all keywords: "+keywords);
+                    param.keywords = (keywords.isEmpty() ? "国际" : keywords.get(0).word);
+                    param.category = null;
+                    Log.i(TAG, "best keywords: "+param.keywords);
+                    return APICaller.getInstance().searchHeadlines(param).blockingGet();
+                }
+            });
         }
         else fetch = ((getSettings().isOffline) //TODO: class RECOMMENDATION
                     ? headlineDao.load(classTags.get(param.category), param.offset, param.limit)
@@ -239,5 +259,8 @@ public class DAO {
             dao.keywordDao = dao.mDb.keywordDao();
         }
         return dao;
+    }
+
+    static private class NoSuchNewsException extends RuntimeException {
     }
 }
