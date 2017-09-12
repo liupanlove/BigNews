@@ -5,6 +5,7 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.OnConflictStrategy;
+import android.arch.persistence.room.Update;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +28,11 @@ public interface HeadlineDao {
     @Query("select * from Headline where newsClassTag = :newsClassTag  order by news_Time desc limit :limit offset :offset")
     Single<List<Headline>> load(String newsClassTag, int offset, int limit);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void addHeadline(Headline headline);
+
+    @Update
+    void updateHeadline(Headline headline);
 
     @Delete()
     void deleteHeadline(Headline headline);
