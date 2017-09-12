@@ -79,7 +79,7 @@ class ConfigStruct {
         tag_list.add("推荐");
         for (int i = 0; i < 12; ++i)
             if (class_use.get(i)) {
-                tag_id_list.add(i);
+                tag_id_list.add(i + 1);
                 tag_list.add(class_data.get(i));
             }
     }

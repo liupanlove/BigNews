@@ -1,5 +1,6 @@
 package bignews.myapplication;
 
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,6 +15,8 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import bignews.myapplication.db.DAO;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
@@ -25,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 import bignews.myapplication.db.DAOParam;
 import bignews.myapplication.db.Headline;
+import bignews.myapplication.utils.HeadlineAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.SingleObserver;
@@ -52,8 +56,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
     private List<Headline> news = new ArrayList<>();
     OnHeadlineSelectedListener mCallback;
-    List<Map<String, Object>> datas = new ArrayList<>();
-    private SimpleAdapter adapter;
+    private HeadlineAdapter adapter;
     private SingleObserver<? super ArrayList<Headline>> subscriber = new SingleObserver<ArrayList<Headline>>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
@@ -63,14 +66,6 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         @Override
         public void onSuccess(@NonNull ArrayList<Headline> strings) {
             news.addAll(strings);
-            for(int i = 0; i < strings.size(); ++i)
-            {
-                Map<String, Object> map = new HashMap<String, Object>();
-                map.put("image", R.drawable.home);
-                map.put("title", strings.get(i).news_Title + "/" + mText);
-                datas.add(map);
-                Log.v("Err", " " + i);
-            }
             adapter.notifyDataSetChanged();
             listView.onRefreshComplete();
             Log.i(TAG, "onSuccess: loadNewsDatasuccess "+mText+" "+news);
@@ -146,8 +141,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
         listView.setOnItemClickListener(this);
 
-        adapter = new SimpleAdapter(getActivity(), datas, R.layout.search_item,
-                                    new String[]{"title", "image"}, new int[]{R.id.title, R.id.image});
+        adapter = new HeadlineAdapter(getActivity().getLayoutInflater(), news);
         listView.setAdapter(adapter);
     }
 

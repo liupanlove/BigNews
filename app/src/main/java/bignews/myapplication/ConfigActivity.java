@@ -3,6 +3,7 @@ package bignews.myapplication;
 import android.app.UiModeManager;
 import android.content.Context;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +15,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.Vector;
 
@@ -32,6 +35,7 @@ public class ConfigActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.config);
+
         mUiModeManager = (UiModeManager) getSystemService(Context.UI_MODE_SERVICE);
 
         ImageButton check_picture_mode = (ImageButton)findViewById(R.id.check_picture_mode);
