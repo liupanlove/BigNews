@@ -86,7 +86,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
     public interface OnHeadlineSelectedListener {
         /** Called by HeadlinesFragment when a list item is selected */
-        public void onArticleSelected(int position);
+        public void onArticleSelected(String id);  // int postion
     }
 
     @Override
@@ -97,8 +97,10 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         // Notify the parent activity of selected item
+        Log.i(TAG, "ArticleClick");
         mCallback = (OnHeadlineSelectedListener)getActivity();
-        mCallback.onArticleSelected(Integer.parseInt(news.get((int)id).news_ID));
+        Log.i(TAG, news.get((int)id).news_ID);
+        mCallback.onArticleSelected((news.get((int)id).news_ID));  // Integer.parseInt
     }
 
     @Override

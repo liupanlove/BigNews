@@ -15,7 +15,7 @@ import java.util.TimerTask;
 
 public class StartActivity extends Activity
 {
-    private long delayTime = 2000;   // sleep 2s
+    private long delayTime = 1500;   // sleep 2s
     private boolean flag = false;
     Timer timer;
     TimerTask task;

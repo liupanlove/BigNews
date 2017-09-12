@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,10 +29,14 @@ import java.util.Locale;
 
 import bignews.myapplication.db.DAO;
 import bignews.myapplication.db.DAOParam;
+import bignews.myapplication.db.News;
+import io.reactivex.SingleObserver;
 
 public class ArticleFragment extends Activity implements View.OnClickListener{
-    final static String ARG_POSITION = "position";
-    int mCurrentPosition = -1;
+    final static String TAG = "ArticleFragment";
+    final static String ARG_POSITION = "id";
+    //int mCurrentPosition = -1;
+    String newsID = "";
     DAO dao = DAO.getInstance();
 
     PopupWindow pop;
@@ -48,6 +53,7 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
     private TextToSpeech tts;
     private ImageView back;
 
+    //private SingleObserver<? super News> subscri
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,8 +62,12 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
         initView();
         initData();
         Intent intent = getIntent();
-        mCurrentPosition = intent.getIntExtra(ARG_POSITION, -1);          //
-        updateArticleView(mCurrentPosition);
+        //mCurrentPosition = intent.getIntExtra(ARG_POSITION, -1);          //
+
+        newsID = intent.getStringExtra(ARG_POSITION);
+        Log.i(TAG, newsID);
+        //updateArticleView(newsID);
+
         speaker = (ImageView) findViewById(R.id.speaker);
 
         ImageView imageView = (ImageView) findViewById(R.id.menu);
@@ -81,7 +91,7 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
             @Override
             public void onClick(View view)
             {
-                tts.speak("我杨国烨觉得你是个大娘们", TextToSpeech.QUEUE_ADD, null);
+                tts.speak("中华人民共和国今天成立啦", TextToSpeech.QUEUE_ADD, null);
             }
         });
     }
@@ -96,6 +106,9 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
                 return;
             case R.id.collect:
                 Toast.makeText(getApplicationContext(), "已收藏", Toast.LENGTH_SHORT);
+                return;
+            case R.id.back:
+                finish();
                 return;
         }
         String pakName = "";
@@ -130,11 +143,13 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
         this.startActivity(Intent.createChooser(intent, "分享到"));
     }
 
-    public void updateArticleView(int position)
+    public void updateArticleView(String id)
     {
         TextView article = (TextView) findViewById(R.id.article);
-        article.setText(dao.getNews(DAOParam.fromNewsId(""+position)).blockingGet().news_Title);
-        mCurrentPosition = position;
+        Log.i(TAG, id);
+        Log.i(TAG, dao.getNews(DAOParam.fromNewsId(id)).blockingGet().news_Title);
+        article.setText(dao.getNews(DAOParam.fromNewsId(id)).blockingGet().news_Title);
+        //mCurrentPosition = position;
     }
     /*@Override
     public void onSaveInstanceState(Bundle outState) {

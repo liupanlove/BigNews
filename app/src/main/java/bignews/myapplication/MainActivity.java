@@ -111,7 +111,7 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    public void onArticleSelected(int position) {
+    public void onArticleSelected(String id) {
 
 /*
         // Create fragment and give it an argument for the selected article
@@ -129,9 +129,9 @@ public class MainActivity extends BaseActivity
         // Commit the transaction
         transaction.commit();
         */
-
+        Log.i(TAG, "onArticleSelected");
         Intent intent = new Intent(this, ArticleFragment.class);
-        intent.putExtra(ArticleFragment.ARG_POSITION, position - 1);
+        intent.putExtra(ArticleFragment.ARG_POSITION, id);
         startActivity(intent);
 
     }

@@ -8,29 +8,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TestActivity extends Activity implements View.OnClickListener{
+import java.util.zip.Inflater;
+
+public class TestActivity extends Activity{
 
     private PopupWindow mPopWindow;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.test);
 
-        Button btn = (Button) findViewById(R.id.btn);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showPopupWindow();
-            }
-        });
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.test1, (LinearLayout) findViewById(R.id.testLinearLayout));
     }
 
-    private void showPopupWindow() {
+    /*private void showPopupWindow() {
         //设置contentView
         View contentView = LayoutInflater.from(TestActivity.this).inflate(R.layout.popuplayout, null);
         mPopWindow = new PopupWindow(contentView,
@@ -70,4 +68,5 @@ public class TestActivity extends Activity implements View.OnClickListener{
             break;
         }
     }
+    */
 }
