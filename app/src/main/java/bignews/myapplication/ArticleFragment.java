@@ -31,6 +31,8 @@ import bignews.myapplication.db.DAO;
 import bignews.myapplication.db.DAOParam;
 import bignews.myapplication.db.News;
 import io.reactivex.SingleObserver;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 
 public class ArticleFragment extends Activity implements View.OnClickListener{
     final static String TAG = "ArticleFragment";
@@ -52,8 +54,25 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
     private LinearLayout linearLayout;
     private TextToSpeech tts;
     private ImageView back;
+    private Disposable disposable;
 
-    //private SingleObserver<? super News> subscri
+    private SingleObserver<? super News> subscriber = new SingleObserver<News>() {
+        @Override
+        public void onSubscribe(@NonNull Disposable d) {
+            disposable = d;
+        }
+
+        @Override
+        public void onSuccess(@NonNull News news) {
+
+
+        }
+
+        @Override
+        public void onError(@NonNull Throwable e) {
+
+        }
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
