@@ -95,7 +95,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         Log.i(TAG, "ArticleClick");
         mCallback = (OnHeadlineSelectedListener)getActivity();
         Log.i(TAG, news.get((int)id).news_ID);
-        mCallback.onArticleSelected((news.get((int)id).news_ID));  // Integer.parseInt
+        mCallback.onArticleSelected((news.get(position - 1).news_ID));  // Integer.parseInt
     }
 
     @Override

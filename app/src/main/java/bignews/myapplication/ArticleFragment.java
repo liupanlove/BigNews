@@ -61,7 +61,10 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
     private ImageView back;
     private Disposable disposable;
     private String newsContent = "";
-
+    private boolean isFavourite;
+    private String auther;
+    private TextView newsAuther;
+    private String pictures;
     private SingleObserver<? super News> subscriber = new SingleObserver<News>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
@@ -76,9 +79,21 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
                 Log.d(TAG, e);
             }*/
             newsContent = news.news_Content;
+            isFavourite = news.isFavorite;
+            auther = news.news_Author;
+            newsAuther.setText(auther);
+            pictures = news.news_Pictures;
+            Log.d(TAG, news.news_Pictures);
             //newsContent += news.news_Content;
+            //newsContent = newsContent.replaceAll("\\s*", "\\n");
             Log.d(TAG, newsContent);
             article.setText(newsContent);
+            if(isFavourite)
+            {
+                collect.setText("取消收藏");
+            }
+            else
+                collect.setText("收藏");
         }
 
         @Override
@@ -127,7 +142,7 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
             @Override
             public void onClick(View view)
             {
-                tts.speak("中华人民共和国今天成立啦", TextToSpeech.QUEUE_ADD, null);
+                tts.speak(newsContent, TextToSpeech.QUEUE_ADD, null); //"1月1日，这是元旦节        "
             }
         });
     }
@@ -141,7 +156,16 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
                 pop.dismiss();
                 return;
             case R.id.collect:
-                Toast.makeText(getApplicationContext(), "已收藏", Toast.LENGTH_SHORT);
+                if(isFavourite){
+                    collect.setText("收藏");
+                    isFavourite = false;
+                    dao.star(newsID).subscribe();
+                }
+                else
+                {
+                    collect.setText("取消收藏");
+                    isFavourite = true;
+                }
                 return;
             case R.id.back:
                 finish();
@@ -200,6 +224,8 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
         view = inflater.inflate(R.layout.popup, null);       // new View
 
         textView = (TextView) findViewById(R.id.article);
+        newsAuther = (TextView) findViewById(R.id.newsauther);
+        back = (ImageView) findViewById(R.id.back);
         linearLayout = (LinearLayout) findViewById(R.id.linear);
         weChatFriend = (ImageButton) view.findViewById(R.id.weChatFriend);
         //weChatZone = (ImageButton) view.findViewById(R.id.weChatZone);
@@ -216,6 +242,7 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
         pop.setBackgroundDrawable(new BitmapDrawable());
         //pop.setContentView(view);
         cancel.setOnClickListener(this);
+        back.setOnClickListener(this);
         collect.setOnClickListener(this);
         weChatFriend.setOnClickListener(this);
         //weChatZone.setOnClickListener(this);
@@ -262,5 +289,15 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
             Log.i(TAG, "onPause: " + " Disposing.");
             disposable.dispose();
         }
+    }
+    @Override
+    protected void onDestroy()
+    {
+        if(tts != null)
+        {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
     }
 }
