@@ -1,6 +1,7 @@
 package bignews.myapplication.utils;
 
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,9 +56,17 @@ public class HeadlineAdapter extends BaseAdapter {
         TextView title = (TextView) view.findViewById(R.id.title);
         SimpleDraweeView image = (SimpleDraweeView) view.findViewById(R.id.image);
         title.setText(u.news_Title);
-        String[] imgs = u.news_Pictures.split(" ");
-        if (imgs.length > 0) {
+        String[] imgs = u.news_Pictures.split("( )|(;)");
+        String img = "";
+        for (int j = 0; j < imgs.length; ++j)
+            if (!imgs[j].equals("")) {
+                img = imgs[j];
+                break;
+            }
+
+        if (!img.equals("")) {
             Uri uri = Uri.parse(imgs[0]);
+            Log.v("Err", i + "  " + imgs[0]);
             image.setImageURI(uri);
         } else {
             image.setVisibility(View.GONE);
