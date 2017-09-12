@@ -31,6 +31,7 @@
         android:background="@color/white"
         android:alpha="0.8">
         <ImageView
+            android:id = "@+id/back"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:background="@drawable/back"/>

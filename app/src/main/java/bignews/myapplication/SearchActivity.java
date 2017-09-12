@@ -1,11 +1,18 @@
 package bignews.myapplication;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleAdapter;
@@ -17,19 +24,23 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Vector;
 
-public class SearchActivity extends Activity implements HeadlinesFragment.OnHeadlineSelectedListener
+import bignews.myapplication.db.DAO;
+
+public class SearchActivity extends AppCompatActivity implements HeadlinesFragment.OnHeadlineSelectedListener
 {
     private static final String TAG = "SearchActivity"; // ???有什么用
-    private Vector<Fragment> fragments;
     private SearchView searchView;
+    private  SimpleAdapter adapter;
     private String queryContent;
+    private int id = -2;
 
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search);
 
-        ListView listView = (ListView) findViewById(R.id.listView);
+        //DAO.init(getApplicationContext());
+        /*ListView listView = (ListView) findViewById(R.id.listView);
         //listView.addHeaderView(line());
         List<Map<String, Object>> listItems = new ArrayList<Map<String, Object>>();
 
@@ -41,15 +52,17 @@ public class SearchActivity extends Activity implements HeadlinesFragment.OnHead
             listItems.add(map);
         }
 
-        SimpleAdapter adapter = new SimpleAdapter(this, listItems, R.layout.search_item,
+        adapter = new SimpleAdapter(this, listItems, R.layout.search_item,
                 new String[]{"title", "image"}, new int[]{R.id.title, R.id.image});
-        listView.setAdapter(adapter);
+        listView.setAdapter(adapter);*/
+
         searchView = (SearchView) findViewById(R.id.searchview1);
         getMessage();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 showContent(s);
+                Log.i(TAG, "onQueryTextSubmit" + s );
                 return true;
             }
 
@@ -85,14 +98,30 @@ public class SearchActivity extends Activity implements HeadlinesFragment.OnHead
     }
 
     @Override
-    public void onArticleSelected(int position)
+    public void onArticleSelected(String id)
     {
         Intent intent = new Intent(this, ArticleFragment.class);
-        intent.putExtra(ArticleFragment.ARG_POSITION, position - 1);
+        intent.putExtra(ArticleFragment.ARG_POSITION, id);
         startActivity(intent);
     }
     private void showContent(String query)
     {
+        //getSupportFragmentManager().findFragmentById("f1").
+        Log.i(TAG, "queryContent" + query);
 
+        Fragment fragment = new HeadlinesFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("text", query);
+        bundle.putInt("id", id);
+        fragment.setArguments(bundle);
+
+        //Fragment.getSupportFragmentManager().b
+        //FragmentManager fragmentManager = getFragmentManager();
+        //getSupportFragmentManager().beginTransaction().add(R.id.searchlinearlayout, fragment, "f1").commit();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.searchlinearlayout, fragment);
+        fragmentTransaction.commit();
+        //LayoutInflater inflater = LayoutInflater.from(this);
+        //View view  = inflater.inflate(R.layout.fragment_layout, (LinearLayout)findViewById(R.id.searchlinearlayout));
     }
 }
