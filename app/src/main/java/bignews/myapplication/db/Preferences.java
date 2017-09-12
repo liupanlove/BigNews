@@ -3,6 +3,7 @@ package bignews.myapplication.db;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -19,11 +20,11 @@ public class Preferences {
 
     public Preferences(Context context) {
         SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
-        settings.getInt("classTags", classTags);
-        settings.getBoolean("isNight", isNight);
-        settings.getBoolean("onlyText", onlyText);
-        settings.getBoolean("isOffline", isOffline);
-        settings.getStringSet("shieldKeywords", shieldKeywords);
+        classTags = settings.getInt("classTags", 0);
+        isNight = settings.getBoolean("isNight", false);
+        onlyText = settings.getBoolean("onlyText", false);
+        isOffline = settings.getBoolean("isOffline", false);
+        shieldKeywords = settings.getStringSet("shieldKeywords", new HashSet<String>());
     }
 
     Preferences(Context context, Preferences old_settings) {

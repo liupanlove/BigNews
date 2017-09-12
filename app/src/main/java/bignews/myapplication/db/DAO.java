@@ -13,7 +13,9 @@ import bignews.myapplication.db.dao.HeadlineDao;
 import bignews.myapplication.db.dao.KeywordDao;
 import bignews.myapplication.db.dao.NewsDao;
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.SingleSource;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 
@@ -25,8 +27,8 @@ public class DAO {
     public static HashMap<Integer, String> classTags;
     static {
         classTags = new HashMap<>();
-        classTags.put(DAOParam.FAVORITE, "收藏");
-        classTags.put(DAOParam.RECOMMENDATION, "推荐");
+        //classTags.put(DAOParam.FAVORITE, "收藏");
+        //classTags.put(DAOParam.RECOMMENDATION, "推荐");
         String tmp[] = {"", "科技", "军事", "国内", "社会", "文化", "汽车", "国际", "体育", "财经", "健康", "娱乐"};
         for (int i = 1; i < tmp.length; ++i)
             classTags.put(i, tmp[i]);
@@ -57,7 +59,7 @@ public class DAO {
     }
 
     public boolean setSettings(Preferences settings) {
-        return new Preferences(context, settings).commit(context);
+        return settings.commit(context);
     }
 
     private DAO() {}
@@ -101,24 +103,25 @@ public class DAO {
      */
     public Single<News> getNews(final DAOParam param)
     {
-        return (getSettings().isOffline //TODO: optimize
-                ? newsDao.findByID(param.newsID)
-                .map(new Function<List<News>, News>() { // workaround
+        Single<News> fetchFromDB = newsDao.findByID(param.newsID)
+                .map(new Function<List<News>, News>() { // get news. workaround
                     @Override
                     public News apply(@NonNull List<News> newses) throws Exception {
-                        if (newses.size() == 0) throw new RuntimeException("No such news.");
+                        Log.i(TAG, "fetchFromDB: "+newses);
+                        if (newses.size() == 0) throw new NoSuchNewsException();
                         return newses.get(0);
                     }
-                })
-                : (APICaller.getInstance().loadNews(param)
-                .map(new Function<News, News>() {
+                });
+        final Single<News> fetchFromAPI = APICaller.getInstance().loadNews(param)
+                .map(new Function<News, News>() {//add news into database
                     @Override
                     public News apply(@NonNull News news) throws Exception {
+                        Log.i(TAG, "fetchFromAPI: "+news);
                         newsDao.addNews(news);
                         return news;
                     }
-                })))
-                .map(new Function<News, News>() {//TODO: Strange
+                })
+                .map(new Function<News, News>() {//adding keywords //TODO: Strange
                     @Override
                     public News apply(@NonNull News news) throws Exception {
                         for (Keyword keyword:
@@ -130,7 +133,19 @@ public class DAO {
                         }
                         return news;
                     }
-                }); //TODO: image? 词条 add news, Keywords to database
+                });
+        if (getSettings().isOffline)
+            return fetchFromDB;
+        else return
+                fetchFromDB.onErrorResumeNext(new Function<Throwable, SingleSource<? extends News>>() {
+                    @Override
+                    public SingleSource<? extends News> apply(@NonNull Throwable throwable) throws Exception {
+                        Log.i(TAG, "onErrorResumeNext: ", throwable);
+                        return NoSuchNewsException.class.isInstance(throwable)
+                                ? fetchFromAPI
+                                : Single.<News>error(throwable);
+                    }
+                }); //TODO: image? 词条? isFavorite?
 
     }
 
@@ -143,12 +158,28 @@ public class DAO {
      */
     public Single<ArrayList<Headline>> getHeadlineList(final DAOParam param)
     {
-        return ((param.keywords == null)
-        ? (((getSettings().isOffline || param.category == DAOParam.FAVORITE) //TODO: class RECOMMENDATION
-            ? headlineDao.load(classTags.get(param.category), param.offset, param.limit)
-            : APICaller.getInstance().loadHeadlines(param)))
-        : APICaller.getInstance().searchHeadlines(param))
-                .map(new Function<List<Headline>, ArrayList<Headline>>() {// check if visited
+        Single<List<Headline>> fetch;
+        if (param.keywords != null)
+            fetch = APICaller.getInstance().searchHeadlines(param);
+        else if (param.category == DAOParam.FAVORITE)
+            fetch = headlineDao.findHeadlineByFavorite(param.offset, param.limit);
+        else if (param.category == DAOParam.RECOMMENDATION) {
+            final Single<List<Keyword>> highFreq = keywordDao.getHighFreqWord();
+            fetch = highFreq.map(new Function<List<Keyword>, List<Headline>>() {
+                @Override
+                public List<Headline> apply(@NonNull List<Keyword> keywords) throws Exception {
+                    Log.i(TAG, "all keywords: "+keywords);
+                    param.keywords = (keywords.isEmpty() ? "国际" : keywords.get(0).word);
+                    param.category = null;
+                    Log.i(TAG, "best keywords: "+param.keywords);
+                    return APICaller.getInstance().searchHeadlines(param).blockingGet();
+                }
+            });
+        }
+        else fetch = ((getSettings().isOffline) //TODO: class RECOMMENDATION
+                    ? headlineDao.load(classTags.get(param.category), param.offset, param.limit)
+                    : APICaller.getInstance().loadHeadlines(param));
+        return fetch.map(new Function<List<Headline>, ArrayList<Headline>>() {// check if visited
                     @Override
                     public ArrayList<Headline> apply(@NonNull List<Headline> headlines) throws Exception {
                         Log.i(TAG, "apply: getHeadlineList");
@@ -166,36 +197,6 @@ public class DAO {
                         return headlines;
                     }
                 });
-        /*
-        cnt += 1;
-        if (cnt % 5 == 0) try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Log.i(TAG, "getHeadlineList: Before: "+Headlines);
-        Headlines.add(String.valueOf(cnt));
-        Log.i(TAG, "getHeadlineList: After: "+Headlines);
-        return (ArrayList<String>) Headlines.clone();
-        */
-        /*
-        return Single.just(new ArrayList<Headline>())
-                .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {
-                    @Override
-                    public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headLines) throws Exception {
-
-                        for (int i = param.offset; i < param.offset + param.limit; ++i) {
-                            Headline headline = new Headline();
-                            headline.news_Title = "title:" + i;
-                            headline.newsClassTag = param.category + "";
-                            headline.newsID = i + "";
-                            headLines.add(headline);
-                        }
-                        return headLines;
-                    }
-                })
-                .blockingGet();
-                */
     }
 
     /**
@@ -207,14 +208,14 @@ public class DAO {
             @Override
             public void run() {
                 Headline headline = getHeadline(DAOParam.fromNewsId(newsID)).blockingGet();
-                headline.newsClassTag = classTags.get(DAOParam.FAVORITE);
+                headline.isFavorite = true;
                 headlineDao.addHeadline(headline);
                 Log.i(TAG, "run: star begin "+newsID);
-                try {
+                /*try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }
+                }*/
                 Log.i(TAG, "run: star end "+newsID);
             }
         });
@@ -228,7 +229,8 @@ public class DAO {
             @Override
             public void run() {
                 Headline headline = getHeadline(DAOParam.fromNewsId(newsID)).blockingGet();
-                headlineDao.deleteHeadline(headline);
+                headline.isFavorite = false;
+                headlineDao.addHeadline(headline);
             }
         });
     }
@@ -257,5 +259,8 @@ public class DAO {
             dao.keywordDao = dao.mDb.keywordDao();
         }
         return dao;
+    }
+
+    static private class NoSuchNewsException extends RuntimeException {
     }
 }
