@@ -46,6 +46,7 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
     private ImageView speaker;
     private LinearLayout linearLayout;
     private TextToSpeech tts;
+    private ImageView back;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
