@@ -3,6 +3,7 @@ package bignews.myapplication;
 import android.app.UiModeManager;
 import android.content.Context;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +15,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.Vector;
 
@@ -32,9 +35,14 @@ public class ConfigActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.config);
+
         mUiModeManager = (UiModeManager) getSystemService(Context.UI_MODE_SERVICE);
 
         ImageButton check_picture_mode = (ImageButton)findViewById(R.id.check_picture_mode);
+        if (BaseActivity.config_struct.picture_mode)
+            check_picture_mode.setImageResource(R.drawable.yes_picture);
+        else
+            check_picture_mode.setImageResource(R.drawable.no_picture);
         check_picture_mode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -43,13 +51,15 @@ public class ConfigActivity extends BaseActivity {
                 else
                     ((ImageButton)view).setImageResource(R.drawable.yes_picture);
                 BaseActivity.config_struct.picture_mode = !BaseActivity.config_struct.picture_mode;
+                BaseActivity.config_struct.push_data();
             }
         });
         ImageButton check_day_mode = (ImageButton)findViewById(R.id.check_day_mode);
         check_day_mode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (BaseActivity.config_struct.day_mode) {
+                BaseActivity.config_struct.day_mode = !BaseActivity.config_struct.day_mode;
+                if (!BaseActivity.config_struct.day_mode) {
                     mUiModeManager.enableCarMode(0);
                     mUiModeManager.setNightMode(UiModeManager.MODE_NIGHT_YES);
                 }
@@ -57,7 +67,7 @@ public class ConfigActivity extends BaseActivity {
                     mUiModeManager.disableCarMode(0);
                     mUiModeManager.setNightMode(UiModeManager.MODE_NIGHT_NO);
                 }
-                BaseActivity.config_struct.day_mode = !BaseActivity.config_struct.day_mode;
+                BaseActivity.config_struct.push_data();
             }
         });
 //vvvvvvvvvvv class vvvvvvvvvvvvvvvv
@@ -81,6 +91,7 @@ public class ConfigActivity extends BaseActivity {
                 BaseActivity.config_struct.refresh_tag_list();
                 BaseActivity.config_struct.class_changed = true;
                 class_adapter.notifyDataSetChanged();
+                BaseActivity.config_struct.push_data();
             }
         });
     }

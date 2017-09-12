@@ -2,6 +2,7 @@ package bignews.myapplication;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.app.UiModeManager;
+import android.arch.persistence.room.Dao;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +30,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import bignews.myapplication.db.DAO;
+import bignews.myapplication.db.Preferences;
+
 /**
  * Created by guoye on 2017/9/7.
  */
@@ -42,7 +46,6 @@ class ConfigStruct {
     public Vector<String> class_data;
     public Vector<Boolean> class_use;
     public ConfigStruct() {
-        Log.v("Err","fuck");
         picture_mode = true;
         day_mode = true;
         class_changed = false;
@@ -76,9 +79,34 @@ class ConfigStruct {
         tag_list.add("推荐");
         for (int i = 0; i < 12; ++i)
             if (class_use.get(i)) {
-                tag_id_list.add(i);
+                tag_id_list.add(i + 1);
                 tag_list.add(class_data.get(i));
             }
+    }
+
+    public void refresh_data() {
+        DAO dao = DAO.getInstance();
+        Preferences p = dao.getSettings();
+        for (int i = 0; i < 12; ++i)
+            if ((p.classTags & (1 << i)) > 0)
+                class_use.set(i, true);
+            else
+                class_use.set(i, false);
+        picture_mode = !p.onlyText;
+        day_mode = !p.isNight;
+        refresh_tag_list();
+    }
+
+    public void push_data() {
+        DAO dao = DAO.getInstance();
+        Preferences p = dao.getSettings();
+        p.classTags = 0;
+        for (int i = 0; i < 12; ++i)
+            if (class_use.get(i))
+                p.classTags += 1 << i;
+        p.onlyText = !picture_mode;
+        p.isNight = !day_mode;
+        dao.setSettings(p);
     }
 }
 
@@ -90,10 +118,13 @@ public class BaseActivity extends AppCompatActivity {
     private Intent config_intent;
     final static public ConfigStruct config_struct = new ConfigStruct();
     private UiModeManager mUiModeManager = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initContentView(R.layout.base_layout);
+        DAO.init(getApplicationContext());
+        config_struct.refresh_data();
         
 	    ImageButton config_button = (ImageButton)findViewById(R.id.config_botton);
         config_intent = new Intent(this, ConfigActivity.class);
