@@ -47,6 +47,7 @@ public class ConfigActivity extends BaseActivity {
                 else
                     ((ImageButton)view).setImageResource(R.drawable.yes_picture);
                 BaseActivity.config_struct.picture_mode = !BaseActivity.config_struct.picture_mode;
+                BaseActivity.config_struct.push_data();
             }
         });
         ImageButton check_day_mode = (ImageButton)findViewById(R.id.check_day_mode);
@@ -62,6 +63,7 @@ public class ConfigActivity extends BaseActivity {
                     mUiModeManager.disableCarMode(0);
                     mUiModeManager.setNightMode(UiModeManager.MODE_NIGHT_NO);
                 }
+                BaseActivity.config_struct.push_data();
             }
         });
 //vvvvvvvvvvv class vvvvvvvvvvvvvvvv
@@ -85,6 +87,7 @@ public class ConfigActivity extends BaseActivity {
                 BaseActivity.config_struct.refresh_tag_list();
                 BaseActivity.config_struct.class_changed = true;
                 class_adapter.notifyDataSetChanged();
+                BaseActivity.config_struct.push_data();
             }
         });
     }
