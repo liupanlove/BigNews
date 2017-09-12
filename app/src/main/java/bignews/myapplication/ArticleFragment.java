@@ -10,7 +10,10 @@ import android.os.Bundle;
 import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.method.ScrollingMovementMethod;
+import android.text.style.AbsoluteSizeSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -66,7 +69,7 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
     private TextView newsAuther;
     private String pictures;
     private String title;
-    private TextView headline;
+    //private TextView headline;
     private SingleObserver<? super News> subscriber = new SingleObserver<News>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
@@ -87,12 +90,17 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
             newsAuther.setText(auther);
             pictures = news.news_Pictures;
             Log.d(TAG, news.news_Pictures);
-            headline.setText(title);
+            int headlineLength = title.length();
+            String str = title + "\n\n" + newsContent;
+            //headline.setText(title);
             //newsContent += news.news_Content;
             //newsContent = newsContent.replaceAll("\\s*", "\\n");
             Log.d(TAG, newsContent);
 
-            article.setText(newsContent);
+            Spannable textSpan = new SpannableStringBuilder(str);
+            textSpan.setSpan(new AbsoluteSizeSpan(80), 0, headlineLength, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            textSpan.setSpan(new AbsoluteSizeSpan(50), headlineLength, str.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            article.setText(textSpan);
             Log.d(TAG, "isFavourite" + isFavourite);
             if(isFavourite)
             {
@@ -232,7 +240,7 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
         LayoutInflater inflater = LayoutInflater.from(this);
         view = inflater.inflate(R.layout.popup, null);       // new View
 
-        headline = (TextView) findViewById(R.id.headline);
+        //headline = (TextView) findViewById(R.id.headline);
         textView = (TextView) findViewById(R.id.article);
         newsAuther = (TextView) findViewById(R.id.newsauther);
         back = (ImageView) findViewById(R.id.back);
