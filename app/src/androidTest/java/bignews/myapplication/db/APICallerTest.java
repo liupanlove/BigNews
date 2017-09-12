@@ -5,6 +5,7 @@ import android.util.Log;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import bignews.myapplication.db.service.APIService;
 import bignews.myapplication.db.service.HeadlineResponse;
@@ -83,14 +84,14 @@ public class APICallerTest {
         param.category = 0;
         for (int i = 0; i < 10; ++i)
         APICaller.getInstance().searchHeadlines(param)
-                .subscribe(new SingleObserver<ArrayList<Headline>>() {
+                .subscribe(new SingleObserver<List<Headline>>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
 
                     }
 
                     @Override
-                    public void onSuccess(@NonNull ArrayList<Headline> headlines) {
+                    public void onSuccess(@NonNull List<Headline> headlines) {
 
                     }
 

@@ -43,8 +43,9 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     private static final int LIMIT = 5;
     DAO dao = DAO.getInstance(); //should be a singleton.
 
-    private String mText;
-    private int mID;
+    private int mode;
+    private String mText;      // Type
+    private int mID;   // mID == -2 表示search
 
     @BindView(R.id.listView)
     PullToRefreshListView listView;
@@ -157,7 +158,11 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     }
 
     private void loadNewsData() {//!!!BUG
-        final DAOParam param = DAOParam.fromCategory(mID, news.size(), LIMIT);
+        final DAOParam param;
+        if(mID == -2)
+            param = DAOParam.fromKeyword(mText, news.size(), LIMIT);
+        else
+            param = DAOParam.fromCategory(mID, news.size(), LIMIT);
         //news = dao.getHeadlineList(param);
         /*Single.create(new SingleOnSubscribe<ArrayList<Headline>>() {
             @Override
