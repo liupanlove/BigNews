@@ -134,10 +134,9 @@ public class DAO {
                         return news;
                     }
                 });
-        if (getSettings().isOffline)
-            return fetchFromDB;
-        else return
-                fetchFromDB.onErrorResumeNext(new Function<Throwable, SingleSource<? extends News>>() {
+        return (getSettings().isOffline
+                ? fetchFromDB
+                : fetchFromDB.onErrorResumeNext(new Function<Throwable, SingleSource<? extends News>>() {
                     @Override
                     public SingleSource<? extends News> apply(@NonNull Throwable throwable) throws Exception {
                         Log.i(TAG, "onErrorResumeNext: ", throwable);
@@ -145,8 +144,16 @@ public class DAO {
                                 ? fetchFromAPI
                                 : Single.<News>error(throwable);
                     }
-                }); //TODO: image? 词条? isFavorite?
-
+                }))
+                .map(new Function<News, News>() {
+                    @Override
+                    public News apply(@NonNull News news) throws Exception {
+                        List<Headline> headline = headlineDao.findHeadlineByID(news.news_ID)
+                                .blockingGet();
+                        news.isFavorite = (!headline.isEmpty() && headline.get(0).isFavorite);
+                        return news;
+                    }
+                });
     }
 
     /**
@@ -209,7 +216,7 @@ public class DAO {
             public void run() {
                 Headline headline = getHeadline(DAOParam.fromNewsId(newsID)).blockingGet();
                 headline.isFavorite = true;
-                headlineDao.addHeadline(headline);
+                headlineDao.updateHeadline(headline);
                 Log.i(TAG, "run: star begin "+newsID);
                 /*try {
                     Thread.sleep(5000);
@@ -230,7 +237,7 @@ public class DAO {
             public void run() {
                 Headline headline = getHeadline(DAOParam.fromNewsId(newsID)).blockingGet();
                 headline.isFavorite = false;
-                headlineDao.addHeadline(headline);
+                headlineDao.updateHeadline(headline);
             }
         });
     }

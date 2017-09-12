@@ -140,6 +140,12 @@ public class DAOTest {
         ArrayList<Headline> headlines = dao.getHeadlineList(DAOParam.fromCategory(DAOParam.FAVORITE, 0, 10)).blockingGet();
         assertEquals(headlines.size(), 0);
 
+        // get news && headline (isFavorite == false)
+        News news = dao.getNews(DAOParam.fromNewsId(headline.news_ID)).blockingGet();
+        assertEquals(false, news.isFavorite);
+        headline = dao.getHeadline(DAOParam.fromNewsId(headline.news_ID)).blockingGet();
+        assertEquals(false, headline.isFavorite);
+
         // Star one piece of news
         dao.star(headline.news_ID).subscribe();
         Log.i(TAG, "star: all headlines="+dao.getHeadlineDao().getAll().blockingGet());
@@ -148,11 +154,22 @@ public class DAOTest {
         headlines = dao.getHeadlineList(DAOParam.fromCategory(DAOParam.FAVORITE, 0, 10)).blockingGet();
         assertEquals(headlines.size(), 1);
 
+        // get news && headline (isFavorite == true)
+        news = dao.getNews(DAOParam.fromNewsId(headline.news_ID)).blockingGet();
+        assertEquals(true, news.isFavorite);
+        headline = dao.getHeadline(DAOParam.fromNewsId(headline.news_ID)).blockingGet();
+        assertEquals(true, headline.isFavorite);
+
         // unstar
         dao.unStar(headline.news_ID).subscribe();
+
+        // get favorites (empty).
         headlines = dao.getHeadlineList(DAOParam.fromCategory(DAOParam.FAVORITE, 0, 10)).blockingGet();
         assertEquals(headlines.size(), 0);
 
+        // get news && headline
+        news = dao.getNews(DAOParam.fromNewsId(headline.news_ID)).blockingGet();
+        assertEquals(false, news.isFavorite);
         headline = dao.getHeadline(DAOParam.fromNewsId(headline.news_ID)).blockingGet();
         assertEquals(false, headline.isFavorite);
     }
