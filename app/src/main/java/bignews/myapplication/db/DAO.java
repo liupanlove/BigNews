@@ -13,7 +13,10 @@ import bignews.myapplication.db.dao.HeadlineDao;
 import bignews.myapplication.db.dao.KeywordDao;
 import bignews.myapplication.db.dao.NewsDao;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.annotations.NonNull;
@@ -65,14 +68,6 @@ public class DAO {
     private DAO() {}
 
     public synchronized static DAO getInstance() {
-        if (dao == null) throw new AssertionError("dao is null. please call init first");
-        return dao;
-    }
-    /**
-     * Return a singleton.
-     * @return the instance of dao
-     */
-    public synchronized static DAO init(Context context) {
         if (dao == null) {
             dao = new DAO();
             dao.context = MyApplication.getAppContext();
@@ -82,10 +77,20 @@ public class DAO {
             dao.keywordDao = dao.mDb.keywordDao();
         }
         return dao;
+        //if (dao == null) throw new AssertionError("dao is null. please call init first");
+        //return dao;
+    }
+    /**
+     * Return a singleton.
+     * @return the instance of dao
+     */
+    public synchronized static DAO init(Context context) {
+        return getInstance();
     }
 
 
     Single<Headline> getHeadline(DAOParam param) {
+        Log.i(TAG, "getHeadline: "+param);
         return headlineDao.findHeadlineByID(param.newsID)
                 .map(new Function<List<Headline>, Headline>() {
                     @Override
@@ -96,6 +101,52 @@ public class DAO {
                 });
     }
 
+    Observable<Headline> headlineObservable(final DAOParam param) {
+        if (!(param.category != DAOParam.FAVORITE && param.category != DAOParam.RECOMMENDATION))
+            throw new AssertionError("Neither favorite nor recommendation is supported now");
+        return Observable.create(new ObservableOnSubscribe<Headline>() {
+            int category = param.category;
+            int pageSize = 4;
+            int pageNo = 1;
+
+            @Override
+            public void subscribe(@NonNull ObservableEmitter<Headline> e) throws Exception {
+                for (Headline headline : APICaller.getInstance().loadHeadlinesRaw(pageNo, pageSize, category).blockingGet()) {
+                    Log.i(TAG, "subscribe: " + headline);
+                    e.onNext(headline);
+                }
+                if (pageNo == pageSize)  {
+                    pageSize *= 2;
+                    pageNo /= 2;
+                }
+                pageNo += 1;
+                e.onComplete();
+            }
+        }).publish()
+                .map(new Function<Headline, Headline>() {// check if visited
+                    @Override
+                    public Headline apply(@NonNull Headline headline) throws Exception {
+                        headline.isVisited = !newsDao.findByID(headline.news_ID)
+                                .blockingGet().isEmpty();
+                        Log.i(TAG, "apply: update isVisited field");
+                        return headline;
+                    }
+                })
+                .map(new Function<Headline, Headline>() {// insert into Headline Database
+                    @Override
+                    public Headline apply(@NonNull Headline headline) throws Exception {
+                        headlineDao.addHeadline(headline);
+                        Log.i(TAG, "apply: insert into database");
+                        return headline;
+                    }
+                })
+                .cache()
+                .repeat();
+        /*((getSettings().isOffline) //TODO: class RECOMMENDATION
+                ? headlineDao.load(classTags.get(param.category), param.offset, param.limit)
+                : APICaller.getInstance().loadHeadlines(param))*/
+    }
+
     /**
      * Get news body.
      * @param param parameter
@@ -103,6 +154,7 @@ public class DAO {
      */
     public Single<News> getNews(final DAOParam param)
     {
+        Log.i(TAG, "getNews: "+param);
         Single<News> fetchFromDB = newsDao.findByID(param.newsID)
                 .map(new Function<List<News>, News>() { // get news. workaround
                     @Override
@@ -165,6 +217,7 @@ public class DAO {
      */
     public Single<ArrayList<Headline>> getHeadlineList(final DAOParam param)
     {
+        Log.i(TAG, "getHeadlineList: "+param);
         Single<List<Headline>> fetch;
         if (param.keywords != null)
             fetch = APICaller.getInstance().searchHeadlines(param);
@@ -211,6 +264,7 @@ public class DAO {
      * @param newsID news ID
      */
     public Completable star(final String newsID) {
+        Log.i(TAG, "star: "+newsID);
         return Completable.fromRunnable(new Runnable() {
             @Override
             public void run() {
@@ -232,6 +286,7 @@ public class DAO {
      * @param newsID news ID
      */
     public Completable unStar(final String newsID) {
+        Log.i(TAG, "unStar: "+newsID);
         return Completable.fromRunnable(new Runnable() {
             @Override
             public void run() {

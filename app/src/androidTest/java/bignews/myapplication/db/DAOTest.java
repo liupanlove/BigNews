@@ -14,11 +14,14 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import bignews.myapplication.db.dao.HeadlineDao;
+import io.reactivex.Observable;
 import io.reactivex.SingleObserver;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 
 import static org.junit.Assert.*;
@@ -127,6 +130,42 @@ public class DAOTest {
                 .repeat(3)
                 .blockingLast();
         Log.i(TAG, "getHeadlineList: headline="+headlines);
+    }
+
+    @Test
+    public void headlineObservable() throws Exception {
+        Observable<Headline> headlineObservable = dao.headlineObservable(DAOParam.fromCategory(1, -10, -10));
+        Thread.sleep(2000);
+        Log.i(TAG, "headlineObservable: first ten.");
+        ArrayList<Headline> headlines =
+                headlineObservable.take(10)
+                .reduce(new ArrayList<Headline>(), new BiFunction<ArrayList<Headline>, Headline, ArrayList<Headline>>() {
+                    @Override
+                    public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines, @NonNull Headline headline) throws Exception {
+                        headlines.add(headline);
+                        return headlines;
+                    }
+                })
+                .blockingGet();
+        for (Headline headline: headlines) {
+            Log.i(TAG, "headlineObservable: " + headline);
+        }
+        assertEquals(10, headlines.size());
+        Log.i(TAG, "headlineObservable: second ten.");
+        headlines =
+                headlineObservable.take(10)
+                        .reduce(new ArrayList<Headline>(), new BiFunction<ArrayList<Headline>, Headline, ArrayList<Headline>>() {
+                            @Override
+                            public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines, @NonNull Headline headline) throws Exception {
+                                headlines.add(headline);
+                                return headlines;
+                            }
+                        })
+                        .blockingGet();
+        for (Headline headline: headlines) {
+            Log.i(TAG, "headlineObservable: " + headline);
+        }
+        assertEquals(10, headlines.size());
     }
 
     @Test
