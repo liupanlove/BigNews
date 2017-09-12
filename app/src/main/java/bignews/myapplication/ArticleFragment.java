@@ -65,6 +65,8 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
     private String auther;
     private TextView newsAuther;
     private String pictures;
+    private String title;
+    private TextView headline;
     private SingleObserver<? super News> subscriber = new SingleObserver<News>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
@@ -78,16 +80,20 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
                 newsContent += e;
                 Log.d(TAG, e);
             }*/
+            title = news.news_Title;
             newsContent = news.news_Content;
             isFavourite = news.isFavorite;
             auther = news.news_Author;
             newsAuther.setText(auther);
             pictures = news.news_Pictures;
             Log.d(TAG, news.news_Pictures);
+            headline.setText(title);
             //newsContent += news.news_Content;
             //newsContent = newsContent.replaceAll("\\s*", "\\n");
             Log.d(TAG, newsContent);
+
             article.setText(newsContent);
+            Log.d(TAG, "isFavourite" + isFavourite);
             if(isFavourite)
             {
                 collect.setText("取消收藏");
@@ -159,12 +165,15 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
                 if(isFavourite){
                     collect.setText("收藏");
                     isFavourite = false;
-                    dao.star(newsID).subscribe();
+                    dao.unStar(newsID).subscribeOn(Schedulers.newThread()).subscribe();
+
                 }
                 else
                 {
                     collect.setText("取消收藏");
                     isFavourite = true;
+                    dao.star(newsID).subscribeOn(Schedulers.newThread())
+                            .subscribe();
                 }
                 return;
             case R.id.back:
@@ -223,6 +232,7 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
         LayoutInflater inflater = LayoutInflater.from(this);
         view = inflater.inflate(R.layout.popup, null);       // new View
 
+        headline = (TextView) findViewById(R.id.headline);
         textView = (TextView) findViewById(R.id.article);
         newsAuther = (TextView) findViewById(R.id.newsauther);
         back = (ImageView) findViewById(R.id.back);

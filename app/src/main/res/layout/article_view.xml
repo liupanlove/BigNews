@@ -59,7 +59,16 @@
             android:layout_marginRight="10dp"
             />
     </android.support.v7.widget.Toolbar>
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <TextView
+        android:id="@+id/headline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:textSize="20sp"
+        android:textColor = "@android:color/black"
+        android:scrollbars = "vertical"
+        android:fadeScrollbars="false"/>
+    <TextView
         android:id="@+id/article"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
