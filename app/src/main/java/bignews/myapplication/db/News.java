@@ -14,6 +14,7 @@ public class News extends Headline {
     public String seggedTitle;
     @Ignore
     public ArrayList<String> seggedPListOfContent;
+    public String news_Content;
     //ArrayList<String> persons;
     @Ignore
     public ArrayList<Keyword> Keywords;

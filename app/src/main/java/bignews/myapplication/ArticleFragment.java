@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,13 +27,16 @@ import org.w3c.dom.Text;
 
 import java.io.File;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import bignews.myapplication.db.DAO;
 import bignews.myapplication.db.DAOParam;
 import bignews.myapplication.db.News;
 import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class ArticleFragment extends Activity implements View.OnClickListener{
     final static String TAG = "ArticleFragment";
@@ -49,12 +53,14 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
     ImageButton qq;
     ImageButton weiBo;
     Button cancel;
+    TextView article;
     private Button collect;
     private ImageView speaker;
     private LinearLayout linearLayout;
     private TextToSpeech tts;
     private ImageView back;
     private Disposable disposable;
+    private String newsContent = "";
 
     private SingleObserver<? super News> subscriber = new SingleObserver<News>() {
         @Override
@@ -64,19 +70,29 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
 
         @Override
         public void onSuccess(@NonNull News news) {
-
-
+            /*for(String e: news.seggedPListOfContent)
+            {
+                newsContent += e;
+                Log.d(TAG, e);
+            }*/
+            newsContent = news.news_Content;
+            //newsContent += news.news_Content;
+            Log.d(TAG, newsContent);
+            article.setText(newsContent);
         }
 
         @Override
         public void onError(@NonNull Throwable e) {
-
+            Log.d(TAG, "onError: "+Log.getStackTraceString(e));
         }
-    }
+    };
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.article_view);
+
+        article = (TextView) findViewById(R.id.article);
+        article.setMovementMethod(ScrollingMovementMethod.getInstance());
 
         initView();
         initData();
@@ -86,7 +102,8 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
         newsID = intent.getStringExtra(ARG_POSITION);
         Log.i(TAG, newsID);
         //updateArticleView(newsID);
-
+        if(newsContent.equals(""))
+            loadNewsData();
         speaker = (ImageView) findViewById(R.id.speaker);
 
         ImageView imageView = (ImageView) findViewById(R.id.menu);
@@ -164,7 +181,7 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
 
     public void updateArticleView(String id)
     {
-        TextView article = (TextView) findViewById(R.id.article);
+       // TextView article = (TextView) findViewById(R.id.article);
         Log.i(TAG, id);
         Log.i(TAG, dao.getNews(DAOParam.fromNewsId(id)).blockingGet().news_Title);
         article.setText(dao.getNews(DAOParam.fromNewsId(id)).blockingGet().news_Title);
@@ -228,5 +245,22 @@ public class ArticleFragment extends Activity implements View.OnClickListener{
         });
     }
 
+    private void loadNewsData()
+    {
+        final DAOParam param = DAOParam.fromNewsId(newsID);
 
+        dao.getNews(param)
+                .timeout(3, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(subscriber);
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (disposable != null) {
+            Log.i(TAG, "onPause: " + " Disposing.");
+            disposable.dispose();
+        }
+    }
 }
