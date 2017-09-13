@@ -18,6 +18,7 @@ import io.reactivex.functions.Function;
  */
 
 public class APICaller {
+    public static final String TAG = "APICaller";
 
     private static APICaller instance;
     private APICaller() {}
@@ -30,6 +31,19 @@ public class APICaller {
         return Tools.getRetrofit()
                 .create(APIService.class)
                 .loadNews(param.newsID);
+    }
+    Single<List<Headline>> loadHeadlinesRaw(final int pageNo, final int pageSize, final int category) {
+        Log.i(TAG, "loadHeadlinesRaw: "+pageNo+ " "+pageSize+" "+category);
+        return Tools.getRetrofit()
+                .create(APIService.class)
+                .loadHeadlines(pageNo, pageSize, category)
+                .map(new Function<HeadlineResponse, List<Headline>>() {
+                    @Override
+                    public List<Headline> apply(@NonNull HeadlineResponse headlineResponse) throws Exception {
+                        Log.i(TAG, "loadHeadlinesRaw: "+pageNo+ " "+pageSize+" "+category);
+                        return headlineResponse.headlines;
+                    }
+                });
     }
     Single<List<Headline>> loadHeadlines(final DAOParam param) {
         return Tools.getRetrofit()
