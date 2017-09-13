@@ -14,11 +14,20 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import bignews.myapplication.db.dao.HeadlineDao;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
 import static org.junit.Assert.*;
@@ -69,14 +78,14 @@ public class DAOTest {
 
     @Test
     public void speedTest() throws Exception {
-        dao.getHeadlineList(DAOParam.fromCategory(1, 0, 10)).subscribe();
-        dao.getHeadlineList(DAOParam.fromCategory(1, 10, 10)).subscribe();
+        dao.headlineObservable(DAOParam.fromCategory(1, 0, 10)).subscribe();
+        dao.headlineObservable(DAOParam.fromCategory(1, 10, 10)).subscribe();
     }
 
     @Test
     public void recommendation() throws Exception {
-        dao.getHeadlineList(DAOParam.fromCategory(DAOParam.RECOMMENDATION, 0, 10)).blockingGet();
-        dao.getHeadlineList(DAOParam.fromCategory(1, 0, 10))
+        dao.headlineObservable(DAOParam.fromCategory(DAOParam.RECOMMENDATION, 0, 10)).blockingGet();
+        dao.headlineObservable(DAOParam.fromCategory(1, 0, 10))
                 .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {
                     @Override
                     public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines) throws Exception {
@@ -89,7 +98,7 @@ public class DAOTest {
                         return headlines;
                     }
                 }).blockingGet();
-        dao.getHeadlineList(DAOParam.fromCategory(DAOParam.RECOMMENDATION, 0, 10)).blockingGet();
+        dao.headlineObservable(DAOParam.fromCategory(DAOParam.RECOMMENDATION, 0, 10)).blockingGet();
     }
 
     @Test
@@ -130,14 +139,66 @@ public class DAOTest {
     }
 
     @Test
+    public void headlineObservable() throws Exception {
+        Single<ArrayList<Headline>> headlineObservable = dao.headlineObservable(DAOParam.fromCategory(1, 0, 10))
+                .timeout(1, TimeUnit.SECONDS)
+                .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {
+                    @Override
+                    public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines) throws Exception {
+                        Log.i(TAG, "After process: ");
+                        return headlines;
+                    }
+                });
+        Thread.sleep(2000);
+        Log.i(TAG, "headlineObservable: first ten.");
+        List<Headline> headlines = null;
+        Disposable disposable = null;
+        headlines = headlineObservable
+                .blockingGet();
+
+                    /*int i = 0;
+                    @Override
+                    public void accept(List<Headline> headlines) throws Exception {
+                        Log.i(TAG, "headlineObservable: i=" + i);
+                        for (Headline headline : headlines) {
+                            Log.i(TAG, "headlineObservable: " + headline);
+                        }
+
+                    }
+                });*/
+        for (Headline headline: headlines) {
+            Log.i(TAG, "headlineObservable: " + headline);
+        }
+        assertEquals(10, headlines.size());
+        Log.i(TAG, "headlineObservable: second ten.");
+        headlines = headlineObservable
+                .blockingGet();
+
+        /*
+                headlineObservable.take(10)
+                        .reduce(new ArrayList<Headline>(), new BiFunction<ArrayList<Headline>, Headline, ArrayList<Headline>>() {
+                            @Override
+                            public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines, @NonNull Headline headline) throws Exception {
+                                headlines.add(headline);
+                                return headlines;
+                            }
+                        })
+                        .blockingGet();*/
+        for (Headline headline: headlines) {
+            Log.i(TAG, "headlineObservable: " + headline);
+        }
+        assertEquals(10, headlines.size());
+    }
+
+    @Test
     public void star() throws Exception {
-        dao.getHeadlineList(DAOParam.fromCategory(1, 0, 10)).repeat(5).blockingSubscribe();
+        dao.headlineObservable(DAOParam.fromCategory(1, 0, 10)).repeat(5).blockingSubscribe();
         Headline headline = dao.getHeadline(DAOParam.fromNewsId("201609130413080e91293fb5402b80437a65970fcb7d")).blockingGet();
         Log.i(TAG, "star: "+headline);
         assertEquals(headline.news_Title, "乐视921邀请函曝光 乐Pro 3悬疑即将揭晓");
 
         // get favorites (empty).
-        ArrayList<Headline> headlines = dao.getHeadlineList(DAOParam.fromCategory(DAOParam.FAVORITE, 0, 10)).blockingGet();
+        ArrayList<Headline> headlines = dao.headlineObservable(DAOParam.fromCategory(DAOParam.FAVORITE, 0, 10)).blockingGet();
         assertEquals(headlines.size(), 0);
 
         // get news && headline (isFavorite == false)
@@ -151,7 +212,7 @@ public class DAOTest {
         Log.i(TAG, "star: all headlines="+dao.getHeadlineDao().getAll().blockingGet());
 
         // get favorites (one item)
-        headlines = dao.getHeadlineList(DAOParam.fromCategory(DAOParam.FAVORITE, 0, 10)).blockingGet();
+        headlines = dao.headlineObservable(DAOParam.fromCategory(DAOParam.FAVORITE, 0, 10)).blockingGet();
         assertEquals(headlines.size(), 1);
 
         // get news && headline (isFavorite == true)
@@ -164,7 +225,7 @@ public class DAOTest {
         dao.unStar(headline.news_ID).subscribe();
 
         // get favorites (empty).
-        headlines = dao.getHeadlineList(DAOParam.fromCategory(DAOParam.FAVORITE, 0, 10)).blockingGet();
+        headlines = dao.headlineObservable(DAOParam.fromCategory(DAOParam.FAVORITE, 0, 10)).blockingGet();
         assertEquals(headlines.size(), 0);
 
         // get news && headline
