@@ -117,7 +117,7 @@ class ConfigStruct {
 
 public class BaseActivity extends AppCompatActivity {
     private LinearLayout contentLayout;
-
+    private LinearLayout linearLayout;
     private SearchView searchView;
     private Toolbar toolBar;
     final static public ConfigStruct config_struct = new ConfigStruct();
@@ -128,8 +128,9 @@ public class BaseActivity extends AppCompatActivity {
         initContentView(R.layout.base_layout);
         DAO.init(getApplicationContext());
         config_struct.refresh_data();
-        
-	toolBar.setTitle("大新闻");
+        linearLayout = (LinearLayout)findViewById(R.id.baselinearlayout);
+        toolBar = (Toolbar) findViewById(R.id.toolbar);
+	    toolBar.setTitle("大新闻");
         toolBar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolBar);
         /*searchView = (SearchView) findViewById(R.id.searchview);

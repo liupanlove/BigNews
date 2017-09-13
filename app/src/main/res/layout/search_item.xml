@@ -27,6 +27,7 @@
         android:textColor="@color/colorText"
         android:textSize="18sp"
         android:padding="5dp"
+        android:paddingTop="15dp"
 
         android:textStyle="bold"/>
     <TextView
@@ -37,5 +38,6 @@
         android:typeface="monospace"
         android:textColor="@color/colorText"
         android:textSize="15sp"
-        android:padding="5dp"/>
+        android:padding="5dp"
+        android:paddingBottom="25dp"/>
 </LinearLayout>
