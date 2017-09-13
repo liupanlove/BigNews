@@ -1,7 +1,9 @@
 package bignews.myapplication;
 
+import android.app.Activity;
 import android.app.UiModeManager;
 import android.content.Context;
+import android.graphics.Color;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -27,15 +30,16 @@ import bignews.myapplication.R;
  * Created by guoye on 2017/9/8.
  */
 
-public class ConfigActivity extends BaseActivity {
+public class ConfigActivity extends Activity {
     private ArrayAdapter<String> class_adapter;
     private Vector<String> class_show_data;
     private UiModeManager mUiModeManager = null;
+    private Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.config);
-
+        context = this;
         mUiModeManager = (UiModeManager) getSystemService(Context.UI_MODE_SERVICE);
 
         ImageButton check_picture_mode = (ImageButton)findViewById(R.id.check_picture_mode);
@@ -73,21 +77,18 @@ public class ConfigActivity extends BaseActivity {
         });
 //vvvvvvvvvvv class vvvvvvvvvvvvvvvv
         class_show_data = (Vector<String>) BaseActivity.config_struct.class_data.clone();
-        for (int i = 0; i < 12; ++i)
-            if (BaseActivity.config_struct.class_use.get(i))
-                class_show_data.set(i, BaseActivity.config_struct.class_data.get(i) + "   o");
         final ListView class_view = (ListView)findViewById(R.id.class_list);
-        class_adapter = new ArrayAdapter<String>(this, R.layout.list_item, class_show_data);
+        class_adapter = new MyListAdapter(this, R.layout.list_item, class_show_data, this.getLayoutInflater());
         class_view.setAdapter(class_adapter);
+        class_adapter.notifyDataSetChanged();
         class_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                TextView tv = (TextView)view;
                 if (BaseActivity.config_struct.class_use.get(i)) {
                     BaseActivity.config_struct.class_use.set(i, false);
-                    class_show_data.set(i, BaseActivity.config_struct.class_data.get(i));
                 } else {
                     BaseActivity.config_struct.class_use.set(i, true);
-                    class_show_data.set(i, BaseActivity.config_struct.class_data.get(i) + "   o");
                 }
                 BaseActivity.config_struct.refresh_tag_list();
                 BaseActivity.config_struct.class_changed = true;

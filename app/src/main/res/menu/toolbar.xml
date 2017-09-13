@@ -9,6 +9,7 @@
         android:icon = "@drawable/search"
         android:actionViewClass="android.widget.SearchView"
         app:showAsAction="collapseActionView|ifRoom"
+        
         />
 <!--
         android:title = "大新闻"-->

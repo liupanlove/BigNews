@@ -6,7 +6,10 @@
     android:layout_width="match_parent"
     android:orientation = "vertical"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:background="@color/colorBackground">
+    android:background="@color/colorBackground"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:elevation="4dip">
 
 
     <com.facebook.drawee.view.SimpleDraweeView
