@@ -101,7 +101,13 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         if(getArguments()!=null){
             mText = getArguments().getString("text");
             mID = getArguments().getInt("id");
-            headlineObservable = dao.headlineObservable(DAOParam.fromCategory(mID, 0, LIMIT));
+
+            if(mID == -2)
+            {
+                headlineObservable = dao.headlineObservable(DAOParam.fromKeyword(mText, 0, LIMIT));
+            }
+            else
+                headlineObservable = dao.headlineObservable(DAOParam.fromCategory(mID, 0, LIMIT));
         }
         if (news.size() == 0)
             loadNewsData();
@@ -151,11 +157,14 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     }
 
     private void loadNewsData() {//!!!BUG
-        final DAOParam param;
+        /*final DAOParam param;
         if(mID == -2)
+        {
             param = DAOParam.fromKeyword(mText, news.size(), LIMIT);
+            Log.i(TAG, "害怕");
+        }
         else
-            param = DAOParam.fromCategory(mID, news.size(), LIMIT);
+            param = DAOParam.fromCategory(mID, news.size(), LIMIT);*/
         //news = dao.getHeadlineList(param);
         /*Single.create(new SingleOnSubscribe<ArrayList<Headline>>() {
             @Override
