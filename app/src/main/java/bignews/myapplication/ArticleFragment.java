@@ -29,6 +29,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
@@ -69,10 +70,10 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
     Button cancel;
     TextView article;
     private Button collect;
-    private ImageView speaker;
+    private Button speaker;
     private LinearLayout linearLayout;
     //private TextToSpeech tts;
-    private ImageView back;
+    private Button back;
     private Disposable disposable;
     private String newsContent = "";
     private boolean isFavourite;
@@ -82,6 +83,7 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
     private String title;
     private String shareContent = "";
     private SpeechSynthesizer mTts;
+    private LinearLayout linearLayout1;
     //private TextView headline;
     private SingleObserver<? super News> subscriber = new SingleObserver<News>() {
         @Override
@@ -102,19 +104,21 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             auther = news.news_Author;
             newsAuther.setText(auther);
             pictures = news.news_Pictures;
+            Log.d(TAG, "Pictues" + pictures);
             Log.d(TAG, news.news_Pictures);
             int headlineLength = title.length();
-            String str = title + "\n\n" + newsContent;
+            String str = "";
+            //String str = title + "\n\n" + newsContent;     // ------------------
             //headline.setText(title);
             //newsContent += news.news_Content;
             //newsContent = newsContent.replaceAll("\\s*", "\\n");
             Log.d(TAG, newsContent);
 
             shareContent += ("标题：" + title + "\n" + "新闻详情：" + news.news_URL);
-            Spannable textSpan = new SpannableStringBuilder(str);
-            textSpan.setSpan(new AbsoluteSizeSpan(80), 0, headlineLength, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-            textSpan.setSpan(new AbsoluteSizeSpan(50), headlineLength, str.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-            article.setText(textSpan);
+            //Spannable textSpan = new SpannableStringBuilder(str);
+            //textSpan.setSpan(new AbsoluteSizeSpan(80), 0, headlineLength, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            //textSpan.setSpan(new AbsoluteSizeSpan(50), headlineLength, str.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            //article.setText(textSpan);
             Log.d(TAG, "isFavourite" + isFavourite);
             if(isFavourite)
             {
@@ -122,6 +126,21 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             }
             else
                 collect.setText("收藏");
+            if(true)       // 无图模式的接口
+            {
+                String [] imgs = pictures.split("( )|(;)|(；)");
+                for(int i = 0; i < imgs.length; ++i)
+                {
+                    if(!imgs[i].equals(""))
+                    {
+                        Log.d(TAG, "Picture[" + i + "]: " + imgs[i]);
+                        /*Uri uri = Uri.parse(imgs[i]);
+                        SimpleDraweeView image = new SimpleDraweeView(ArticleFragment.this);
+                        image.setImageURI(uri);
+                        linearLayout1.addView(image);*/
+                    }
+                }
+            }
         }
 
         @Override
@@ -140,7 +159,7 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
 
         mTts = SpeechSynthesizer.createSynthesizer(ArticleFragment.this, null);
         article = (TextView) findViewById(R.id.article);
-        article.setMovementMethod(ScrollingMovementMethod.getInstance());
+        //article.setMovementMethod(ScrollingMovementMethod.getInstance());
 
         ttsInit();
         initView();
@@ -150,12 +169,25 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
 
         newsID = intent.getStringExtra(ARG_POSITION);
         Log.i(TAG, newsID);
+        Uri uri = Uri.parse("http://himg2.huanqiu.com/attachment2010/2016/0912/13/16/20160912011621140.png");
+        //SimpleDraweeView image = new SimpleDraweeView(ArticleFragment.this);
+        //image.setImageURI(uri);
+        linearLayout1 = (LinearLayout) findViewById(R.id.articlelinearlayout);
+        Button tmp = new Button(this);
+        tmp.setText("haipa");
+
+        linearLayout1.addView(tmp);//, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        //tmp.setLayoutParams();
+        tmp.setWidth(100);
+        tmp.setHeight(100);
+        Log.i(TAG, "width " + tmp.getWidth());
+
         //updateArticleView(newsID);
         if(newsContent.equals(""))
             loadNewsData();
-        speaker = (ImageView) findViewById(R.id.speaker);
+        speaker = (Button) findViewById(R.id.speaker);
 
-        ImageView imageView = (ImageView) findViewById(R.id.menu);
+        Button imageView = (Button) findViewById(R.id.menu);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -229,28 +261,6 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
                 pakName = "com.qzone";
                 break;*/
         }
-        /*Intent intent = new Intent(Intent.ACTION_SEND);
-
-        //File f = new File("/storage/emulated/0/DCIM/Camera/IMG_20161125_094646.jpg");
-        //Uri u = Uri.fromFile(f);
-        //intent.putExtra(intent.EXTRA_STREAM, u);
-        intent.setType("text/html");
-        //intent.putExtra("body", "233");
-
-        intent.putExtra(Intent.EXTRA_SUBJECT, "这里是分享主题");
-        intent.putExtra(Intent.EXTRA_TEXT, "<a href = \"http://www.baidu.com\"> 哈哈 </a>");
-
-        intent.setPackage(pakName);
-        this.startActivity(Intent.createChooser(intent, "分享到"));*/
-        /*Intent intent = new Intent(Intent.ACTION_SEND);
-        File f = new File("/storage/emulated/0/DCIM/Camera/IMG_20161125_094646.jpg");
-        Uri uri = Uri.fromFile(f);
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        intent.setType("image/*");
-        intent.putExtra("sms_body", "我是ygy大爷");
-        intent.setPackage(pakName);
-        intent.putExtra(Intent.EXTRA_TEXT, "我是ygy大爷");
-        this.startActivity(Intent.createChooser(intent, "分享到"));*/
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_TEXT, shareContent);
@@ -281,8 +291,9 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
         //headline = (TextView) findViewById(R.id.headline);
         textView = (TextView) findViewById(R.id.article);
         newsAuther = (TextView) findViewById(R.id.newsauther);
-        back = (ImageView) findViewById(R.id.back);
+        back = (Button) findViewById(R.id.back);
         linearLayout = (LinearLayout) findViewById(R.id.linear);
+        //linearLayout1 = (LinearLayout) findViewById(R.id.articlelinearlayout);
         weChatFriend = (ImageButton) view.findViewById(R.id.weChatFriend);
         //weChatZone = (ImageButton) view.findViewById(R.id.weChatZone);
         qq = (ImageButton) view.findViewById(R.id.qq);

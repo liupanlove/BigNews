@@ -30,7 +30,7 @@
         android:layout_height = "wrap_content"
         android:background="@color/white"
         android:alpha="0.8">
-        <ImageView
+        <Button
             android:id = "@+id/back"
             android:layout_width="25dp"
             android:layout_height="25dp"
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity = "center"
             android:textColor="@android:color/black"/>
-        <ImageView
+        <Button
             android:id = "@+id/menu"
             android:layout_width="25dp"
             android:layout_height="25dp"
@@ -50,7 +50,7 @@
             android:layout_gravity="right"
             android:layout_marginRight="10dp"
             />
-        <ImageView
+        <Button
             android:id = "@+id/speaker"
             android:layout_width="25dp"
             android:layout_height="25dp"
@@ -68,13 +68,25 @@
         android:textColor = "@android:color/black"
         android:scrollbars = "vertical"
         android:fadeScrollbars="false"/-->
-    <TextView
-        android:id="@+id/article"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:textSize="18sp"
-        android:textColor = "@android:color/black"
-        android:scrollbars = "vertical"
-        android:fadeScrollbars="false"/>
+        android:scrollbars="vertical"
+        android:fadingEdge="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/articlelinearlayout" >
+            <TextView
+                android:id="@+id/article"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:textSize="18sp"
+                android:textColor = "@android:color/black"
+                /> <!--android:scrollbars = "vertical"
+                android:fadeScrollbars="false"-->
+        </LinearLayout>
+    </ScrollView>
+
 </LinearLayout>
