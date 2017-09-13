@@ -7,6 +7,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import bignews.myapplication.MyApplication;
 import bignews.myapplication.db.dao.HeadlineDao;
@@ -18,8 +19,11 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
 import io.reactivex.SingleSource;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
 /**
@@ -101,50 +105,71 @@ public class DAO {
                 });
     }
 
-    Observable<Headline> headlineObservable(final DAOParam param) {
+    Single<ArrayList<Headline>> headlineObservableTest(final DAOParam param) {
         if (!(param.category != DAOParam.FAVORITE && param.category != DAOParam.RECOMMENDATION))
             throw new AssertionError("Neither favorite nor recommendation is supported now");
-        return Observable.create(new ObservableOnSubscribe<Headline>() {
-            int category = param.category;
-            int pageSize = 4;
-            int pageNo = 1;
+        //Integer category = param.category;
+        //Integer offset = 0;
+        //Integer limit = param.limit;
+        //int pageSize = -10;
+        //int pageNo = -10;
+        return Single.create(new SingleOnSubscribe<ArrayList<Headline>>() {
+            //int category = param.category;
+            //int offset = 0;
+            //int limit = param.limit;
+            //int pageSize = -10;
+            //int pageNo = -10;
 
             @Override
-            public void subscribe(@NonNull ObservableEmitter<Headline> e) throws Exception {
-                for (Headline headline : APICaller.getInstance().loadHeadlinesRaw(pageNo, pageSize, category).blockingGet()) {
+            public void subscribe(@NonNull SingleEmitter<ArrayList<Headline>> e) throws Exception {
+                ArrayList<Headline> headlines = (ArrayList<Headline>) APICaller.getInstance()
+                        .loadHeadlines(DAOParam.fromCategory(param.category, param.offset, param.limit))
+                        .blockingGet();
+                for (Headline headline : headlines) {
                     Log.i(TAG, "subscribe: " + headline);
-                    e.onNext(headline);
+                    headline.isVisited = !newsDao.findByID(headline.news_ID)
+                            .blockingGet().isEmpty();
+                    Log.i(TAG, "update isVisited field");
+                    headlineDao.addHeadline(headline);
+                    Log.i(TAG, "insert into database");
                 }
+                /*
                 if (pageNo == pageSize)  {
                     pageSize *= 2;
                     pageNo /= 2;
                 }
                 pageNo += 1;
-                e.onComplete();
+                */
+                e.onSuccess(headlines);
             }
-        }).publish()
-                .map(new Function<Headline, Headline>() {// check if visited
-                    @Override
-                    public Headline apply(@NonNull Headline headline) throws Exception {
-                        headline.isVisited = !newsDao.findByID(headline.news_ID)
-                                .blockingGet().isEmpty();
-                        Log.i(TAG, "apply: update isVisited field");
-                        return headline;
-                    }
-                })
-                .map(new Function<Headline, Headline>() {// insert into Headline Database
-                    @Override
-                    public Headline apply(@NonNull Headline headline) throws Exception {
-                        headlineDao.addHeadline(headline);
-                        Log.i(TAG, "apply: insert into database");
-                        return headline;
-                    }
-                })
-                .cache()
-                .repeat();
+        }).doAfterSuccess(new Consumer<ArrayList<Headline>>() {
+            @Override
+            public void accept(ArrayList<Headline> headlines) throws Exception {
+                Log.i(TAG, "doAfterSuccess: "+headlines);
+                param.offset += param.limit;
+            }
+        });//.publish()
+                //.cache();
         /*((getSettings().isOffline) //TODO: class RECOMMENDATION
                 ? headlineDao.load(classTags.get(param.category), param.offset, param.limit)
                 : APICaller.getInstance().loadHeadlines(param))*/
+    }
+
+    public Single<ArrayList<Headline>> headlineObservable(final DAOParam param) {
+        return Single.defer(new Callable<SingleSource<? extends ArrayList<Headline>>>() {
+            @Override
+            public SingleSource<? extends ArrayList<Headline>> call() throws Exception {
+                Thread.sleep(2000);
+                return getHeadlineList(param);
+            }
+        }).doAfterSuccess(
+                new Consumer<ArrayList<Headline>>() {
+                    @Override
+                    public void accept(ArrayList<Headline> headlines) throws Exception {
+                        Log.i(TAG, "doAfterSuccess: " + headlines);
+                        param.offset += param.limit;
+                    }
+                });
     }
 
     /**
@@ -215,6 +240,7 @@ public class DAO {
      * @param param parameter
      * @return An ArrayList containing the headlines
      */
+    @Deprecated
     public Single<ArrayList<Headline>> getHeadlineList(final DAOParam param)
     {
         Log.i(TAG, "getHeadlineList: "+param);

@@ -24,6 +24,7 @@ import bignews.myapplication.db.DAOParam;
 import bignews.myapplication.db.Headline;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -39,6 +40,8 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     private static final String TAG = "HeadlinesFragment";
     private static final int LIMIT = 5;
     DAO dao = DAO.getInstance(); //should be a singleton.
+    Single<ArrayList<Headline>> headlineObservable = null;
+
 
     private String mText;
 
@@ -95,6 +98,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         super.onCreate(bundle);
         if(getArguments()!=null){
             mText = getArguments().getString("text");
+            headlineObservable = dao.headlineObservable(DAOParam.fromCategory(Integer.parseInt(mText), 0, LIMIT));
         }
     }
 
@@ -152,7 +156,8 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
                 e.onSuccess(dao.getHeadlineList(param));
             }
         })*/
-        dao.getHeadlineList(param)
+        //dao.getHeadlineList(param)
+        headlineObservable
                 .timeout(3, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
