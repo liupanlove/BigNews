@@ -23,7 +23,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 
 public class MainActivity extends BaseActivity
-        implements HeadlinesFragment.OnHeadlineSelectedListener{
+        implements HeadlinesFragment.OnHeadlineSelectedListener {
 
     private static final String TAG = "MainActivity";
     private Vector<Fragment> fragments;

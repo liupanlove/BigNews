@@ -63,23 +63,23 @@ public class APICaller {
                         return headlineResponse;
                     }
                 })*/
-                .flattenAsObservable(new Function<HeadlineResponse, List<Headline>>() {
+                .map(new Function<HeadlineResponse, List<Headline>>() {
                     @Override
                     public List<Headline> apply(@NonNull HeadlineResponse headlineResponse) throws Exception {
-                        return headlineResponse.headlines;
+                        int sz = headlineResponse.headlines.size();
+                        int start = Math.min(sz, param.offset - 1);
+                        Log.i(TAG, "news count: "+(sz - start));
+                        return headlineResponse.headlines.subList(param.offset, sz);
                     }
                 })
-                .skip(param.offset)
+                /*.skip(param.offset)
                 .reduce(new ArrayList<Headline>(), new BiFunction<List<Headline>, Headline, List<Headline>>() {
                     @Override
                     public List<Headline> apply(@NonNull List<Headline> headlines, @NonNull Headline headline) throws Exception {
                         headlines.add(headline);
                         return headlines;
                     }
-                });
-
-
-                //subList(param.offset, param.offset + param.limit);
+                })*/;
     }
 
     Single<List<Headline>> searchHeadlines(DAOParam param) {

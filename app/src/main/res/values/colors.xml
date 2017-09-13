@@ -13,6 +13,6 @@
     <color name="white">#ffffff</color> <!-- 白色 -->
     <color name="translucent">#e0000000</color>  <!-- 半透明 -->
     <color name="gray">#BFBFBF</color>
-    <color name = "littlegray">#cccccc</color>
+    <color name = "littlegray">#EBEBEB</color>         <!--cccccccc -->
     <color name="gold">#ffd700</color>
 </resources>

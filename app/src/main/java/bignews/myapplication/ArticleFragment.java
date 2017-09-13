@@ -1,6 +1,7 @@
 package bignews.myapplication;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -21,6 +22,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewParent;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -198,6 +201,18 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onClick(View view) {
                 pop.showAtLocation(linearLayout, Gravity.BOTTOM, 0, 0);
+                WindowManager.LayoutParams lp = getWindow().getAttributes();
+                lp.alpha = 0.5f;
+                getWindow().setAttributes(lp);
+                pop.setOnDismissListener(new PopupWindow.OnDismissListener() {
+
+                    @Override
+                    public void onDismiss() {
+                        WindowManager.LayoutParams lp = getWindow().getAttributes();
+                        lp.alpha = 1f;
+                        getWindow().setAttributes(lp);
+                    }
+                });
             }
         });
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -236,7 +251,6 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
                     collect.setText("收藏");
                     isFavourite = false;
                     dao.unStar(newsID).subscribeOn(Schedulers.newThread()).subscribe();
-                    //BaseActivity.config_struct
                 }
                 else
                 {
@@ -245,6 +259,7 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
                     dao.star(newsID).subscribeOn(Schedulers.newThread())
                             .subscribe();
                 }
+                BaseActivity.config_struct.favorite_changed = true;
                 return;
             case R.id.back:
                 finish();
@@ -377,6 +392,11 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             Log.i(TAG, "onPause: " + " Disposing.");
             disposable.dispose();
         }
+        if(mTts != null)
+        {
+            mTts.stopSpeaking();
+            mTts.destroy();
+        }
     }
     @Override
     protected void onDestroy()
@@ -387,6 +407,25 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             mTts.stopSpeaking();
             mTts.destroy();
         }
+    }
 
+    private void dimBackground(PopupWindow popup, float dimAmount) {
+        ViewParent vp = popup.getContentView().getParent();
+        WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        if (vp instanceof View) {
+            // PopupWindow has background drawable set
+            View container = (View) popup.getContentView().getParent();
+            WindowManager.LayoutParams p = (WindowManager.LayoutParams) container.getLayoutParams();
+            p.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+            p.dimAmount = dimAmount;
+            wm.updateViewLayout(container, p);
+        } else {
+            // PopupWindow has no background drawable
+            WindowManager.LayoutParams p =
+                    (WindowManager.LayoutParams) popup.getContentView().getLayoutParams();
+            p.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+            p.dimAmount = dimAmount;
+            wm.updateViewLayout(popup.getContentView(), p);
+        }
     }
 }

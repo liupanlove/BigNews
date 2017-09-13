@@ -4,8 +4,11 @@ import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.util.Log;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -25,6 +28,8 @@ import io.reactivex.SingleSource;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+
+import static java.util.Collections.sort;
 
 /**
  * Created by lazycal on 2017/9/7.
@@ -159,7 +164,6 @@ public class DAO {
         return Single.defer(new Callable<SingleSource<? extends ArrayList<Headline>>>() {
             @Override
             public SingleSource<? extends ArrayList<Headline>> call() throws Exception {
-                Thread.sleep(2000);
                 return getHeadlineList(param);
             }
         }).doAfterSuccess(
@@ -190,25 +194,28 @@ public class DAO {
                     }
                 });
         final Single<News> fetchFromAPI = APICaller.getInstance().loadNews(param)
-                .map(new Function<News, News>() {//add news into database
-                    @Override
-                    public News apply(@NonNull News news) throws Exception {
-                        Log.i(TAG, "fetchFromAPI: "+news);
-                        newsDao.addNews(news);
-                        return news;
-                    }
-                })
-                .map(new Function<News, News>() {//adding keywords //TODO: Strange
+                .map(new Function<News, News>() {
                     @Override
                     public News apply(@NonNull News news) throws Exception {
                         for (Keyword keyword:
-                                news.Keywords) {
+                                news.Keywords) { //adding keywords
                             List<Keyword> keywords = keywordDao.findKeywordByText(keyword.word).blockingGet();
                             Keyword newKeyword = new Keyword(keyword.word, keyword.score);
                             if (keywords.size() != 0) newKeyword.score += keywords.get(0).score;
                             keywordDao.addKeyword(newKeyword);
                         }
+                        sort(news.persons);
+                        for (News.Person person:
+                                news.persons) { //add baidu baidke link
+                            String encoded = URLEncoder.encode(person.word, "UTF-8");
+                            news.news_Content = news.news_Content.replaceAll(person.word,
+                                    String.format("<a href=\"https://baike.baidu.com/item/%s\">%s</a>",
+                                            encoded, person.word));
+                        }
+                        Log.i(TAG, "fetchFromAPI: "+news);
+                        newsDao.addNews(news); //add news into database
                         return news;
+
                     }
                 });
         return (getSettings().isOffline
@@ -254,15 +261,23 @@ public class DAO {
             fetch = highFreq.map(new Function<List<Keyword>, List<Headline>>() {
                 @Override
                 public List<Headline> apply(@NonNull List<Keyword> keywords) throws Exception {
-                    Log.i(TAG, "all keywords: "+keywords);
-                    param.keywords = (keywords.isEmpty() ? "国际" : keywords.get(0).word);
+                    Log.i(TAG, "all best keywords: "+keywords);
+                    if (keywords.isEmpty()) param.keywords = "国际";
+                    else {
+                        param.keywords = "";
+                        for (Keyword keyword : keywords) {
+                            param.keywords += keyword.word + " ";
+                        }
+                    }
                     param.category = null;
                     Log.i(TAG, "best keywords: "+param.keywords);
                     return APICaller.getInstance().searchHeadlines(param).blockingGet();
                 }
             });
+        }else if (param.category == DAOParam.HISTORY) {
+            fetch = headlineDao.loadHistory(param.offset, param.limit);
         }
-        else fetch = ((getSettings().isOffline) //TODO: class RECOMMENDATION
+        else fetch = ((getSettings().isOffline)
                     ? headlineDao.load(classTags.get(param.category), param.offset, param.limit)
                     : APICaller.getInstance().loadHeadlines(param));
         return fetch.map(new Function<List<Headline>, ArrayList<Headline>>() {// check if visited
@@ -278,8 +293,10 @@ public class DAO {
                 .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {// insert into Headline Database
                     @Override
                     public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines) throws Exception {
+                        Log.i(TAG, "insert into Headline Database begin");
                         for (Headline headline : headlines)
                             headlineDao.addHeadline(headline);
+                        Log.i(TAG, "insert into Headline Database done");
                         return headlines;
                     }
                 });

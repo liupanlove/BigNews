@@ -6,7 +6,8 @@
     android:id = "@+id/linear"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/littlegray">
 
     <!--android.support.design.widget.TabLayout
         android:id="@+id/articlebar"
@@ -29,20 +30,21 @@
         android:id = "@+id/toolbar1"
         android:layout_width = "match_parent"
         android:layout_height = "wrap_content"
-        android:background="@color/white"
+        android:background="@color/littlegray"
         android:alpha="0.8">
         <Button
             android:id = "@+id/back"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:background="@drawable/back"/>
+            android:background="@drawable/back" />
 
         <TextView
             android:id= "@+id/newsauther"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity = "center"
-            android:textColor="@android:color/black"/>
+            android:textColor="@android:color/black"
+            android:typeface="serif"/>
         <Button
             android:id = "@+id/menu"
             android:layout_width="25dp"
@@ -78,17 +80,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/articlelinearlayout"
-            android:orientation="vertical">
-
-
+            android:orientation="vertical"
+            android:background="@color/littlegray">
 
             <TextView
                 android:id="@+id/headline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:padding="5dp"
                 android:textSize="22sp"
-                android:textColor = "@android:color/black"/>
+                android:textColor = "@android:color/black"
+                android:background="@color/littlegray"
+                android:textStyle="bold"/>
 
             <LinearLayout
                 android:id="@+id/articlelinearlayout1"
@@ -100,9 +103,10 @@
                 android:id="@+id/article"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:padding="5dp"
                 android:textSize="18sp"
                 android:textColor = "@android:color/black"
+                android:background="@color/littlegray"
                 /> <!--android:scrollbars = "vertical"
                 android:fadeScrollbars="false"-->
         </LinearLayout>

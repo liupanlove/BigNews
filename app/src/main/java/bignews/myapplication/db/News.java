@@ -2,6 +2,7 @@ package bignews.myapplication.db;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
+import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 
 import java.util.ArrayList;
@@ -11,11 +12,12 @@ import java.util.ArrayList;
  */
 @Entity
 public class News extends Headline {
-    public String seggedTitle;
+    //public String seggedTitle;
     @Ignore
-    public ArrayList<String> seggedPListOfContent;
+    ArrayList<Person> persons;
     public String news_Content;
     //ArrayList<String> persons;
+    //public ArrayList<String> seggedPListOfContent;
     @Ignore
     public ArrayList<Keyword> Keywords;
 
@@ -23,7 +25,19 @@ public class News extends Headline {
     public String toString() {
         return "News{" +
                 super.toString() +
-                "Keywords=" + Keywords +
+                //"news_Content=" + news_Content +
                 '}';
+    }
+    static class Person implements Comparable {
+        String word;
+        int count;
+
+        @Override
+        public int compareTo(@NonNull Object o) {
+            Person p = (Person)o;
+            if (word.length() < p.word.length()) return -1;
+            else if (word.length() > p.word.length()) return 1;
+            else return word.compareTo(p.word);
+        }
     }
 }
