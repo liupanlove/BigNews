@@ -2,6 +2,7 @@ package bignews.myapplication.db;
 
 import android.arch.persistence.room.Room;
 import android.content.Context;
+import android.support.annotation.MainThread;
 import android.util.Log;
 
 import java.net.URLEncoder;
@@ -21,10 +22,12 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.SingleSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -162,8 +165,32 @@ public class DAO {
 
     public Single<ArrayList<Headline>> headlineObservable(final DAOParam param) {
         return Single.defer(new Callable<SingleSource<? extends ArrayList<Headline>>>() {
+            DAOParam daoParam = null;
             @Override
             public SingleSource<? extends ArrayList<Headline>> call() throws Exception {
+                if (param.category == DAOParam.RECOMMENDATION) {
+                    if (daoParam == null) { //first setup
+                        daoParam = DAOParam.fromCategory(null, param.offset, param.limit);
+                        List<Keyword> keywords = keywordDao.getHighFreqWord().blockingGet();
+                        if (keywords.isEmpty()) daoParam.keywords = "国际";
+                        else {
+                            daoParam.keywords = "";
+                            for (Keyword keyword : keywords) {
+                                daoParam.keywords += keyword.word + " ";
+                            }
+                        }
+                        daoParam.category = null;
+                    }
+                    Log.i(TAG, "Thread: "+Thread.currentThread());
+                    Log.i(TAG, "best keywords: "+daoParam.keywords);
+                    return APICaller.getInstance().searchHeadlines(daoParam)
+                            .map(new Function<List<Headline>, ArrayList<Headline>>() {
+                                @Override
+                                public ArrayList<Headline> apply(@NonNull List<Headline> headlines) throws Exception {
+                                    return (ArrayList) headlines;
+                                }
+                            });
+                }
                 return getHeadlineList(param);
             }
         }).doAfterSuccess(
@@ -208,7 +235,7 @@ public class DAO {
                         for (News.Person person:
                                 news.persons) { //add baidu baidke link
                             String encoded = URLEncoder.encode(person.word, "UTF-8");
-                            news.news_Content = news.news_Content.replaceAll(person.word,
+                            news.news_HTMLContent = news.news_Content.replaceAll(person.word,
                                     String.format("<a href=\"https://baike.baidu.com/item/%s\">%s</a>",
                                             encoded, person.word));
                         }
@@ -257,6 +284,29 @@ public class DAO {
         else if (param.category == DAOParam.FAVORITE)
             fetch = headlineDao.findHeadlineByFavorite(param.offset, param.limit);
         else if (param.category == DAOParam.RECOMMENDATION) {
+            /*
+            fetch = Single.create(new SingleOnSubscribe<List<Headline>>() {
+                DAOParam daoParam = null;
+                @Override
+                public void subscribe(@NonNull SingleEmitter<List<Headline>> e) throws Exception {
+                    if (daoParam == null) {
+                        daoParam = param;
+                        List<Keyword> keywords = keywordDao.getHighFreqWord().blockingGet();
+                        if (keywords.isEmpty()) daoParam.keywords = "国际";
+                        else {
+                            daoParam.keywords = "";
+                            for (Keyword keyword : keywords) {
+                                daoParam.keywords += keyword.word + " ";
+                            }
+                        }
+                        daoParam.category = null;
+                        Log.i(TAG, "all best keywords: "+keywords+" daoParam: "+daoParam);
+                        Log.i(TAG, "best keywords: "+daoParam.keywords);
+                    }
+                    e.onSuccess(APICaller.getInstance().searchHeadlines(daoParam).blockingGet());
+                }
+            });
+            */
             final Single<List<Keyword>> highFreq = keywordDao.getHighFreqWord();
             fetch = highFreq.map(new Function<List<Keyword>, List<Headline>>() {
                 @Override
