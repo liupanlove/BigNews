@@ -32,7 +32,7 @@ public class SearchActivity extends AppCompatActivity implements HeadlinesFragme
     private SearchView searchView;
     private  SimpleAdapter adapter;
     private String queryContent;
-    private int id = -2;
+    private final int id = -2;
 
     protected void onCreate(Bundle savedInstanceState)
     {
