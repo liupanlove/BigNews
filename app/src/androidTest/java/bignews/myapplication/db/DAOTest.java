@@ -102,6 +102,14 @@ public class DAOTest {
     }
 
     @Test
+    public void url() throws Exception {
+        News news = dao.getNews(DAOParam.fromNewsId("201608090432c815a85453c34d8ca43a591258701e9b")).blockingGet();
+        Log.i(TAG, "url: "+news.news_Content);
+        assertNotEquals(-1, news.news_Content.indexOf("href"));
+
+    }
+
+    @Test
     public void getHeadlineList() throws Exception {
         ArrayList<Headline> headlines = dao.getHeadlineList(DAOParam.fromCategory(1, 0, 10))
                 .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {
@@ -118,7 +126,8 @@ public class DAOTest {
                 .repeat(3)
                 .blockingLast();
         Log.i(TAG, "getHeadlineList: get All News="+dao.getNewsDao().getAll().blockingGet());
-        Log.i(TAG, "getHeadlineList: headlinefirst="+headlines.get(0));
+        Headline headline = dao.getHeadline(DAOParam.fromNewsId(headlines.get(0).news_ID)).blockingGet();
+        Log.i(TAG, "getHeadlineList: headlinefirst="+headline);
         assertEquals(headlines.get(0).isVisited, true);
 
         headlines = dao.getHeadlineList(DAOParam.fromKeyword("杭州 江苏", 0, 10))
@@ -136,6 +145,36 @@ public class DAOTest {
                 .repeat(3)
                 .blockingLast();
         Log.i(TAG, "getHeadlineList: headline="+headlines);
+    }
+
+    @Test
+    public void loadHistory() throws Exception {
+        for (News news : dao.getNewsDao().getAll().blockingGet()) {
+            dao.getNewsDao().deleteNews(news);
+        }
+        ArrayList<Headline> headlines = dao.headlineObservable(DAOParam.fromCategory(1, 0, 10))
+                .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {
+                    @Override
+                    public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines) throws Exception {
+                        Log.i(TAG, "apply: getHeadlineList");
+                        for (Headline headline :
+                                headlines) {
+                            dao.getNews(DAOParam.fromNewsId(headline.news_ID)).subscribe();
+                        }
+                        return headlines;
+                    }
+                }).blockingGet();
+        HashSet<String> hashset1 = new HashSet<>(), hashset2 = new HashSet<>();
+        for (Headline headline : headlines) {
+            Log.i(TAG, "loadHistory: headline"+headline);
+            hashset1.add(headline.news_ID);
+        }
+        List<Headline> histories = dao.getHeadlineDao().loadHistory(0, 100).blockingGet();
+        for (Headline history : histories) {
+            Log.i(TAG, "loadHistory: history"+history);
+            hashset2.add(history.news_ID);
+        }
+        assertEquals(hashset1, hashset2);
     }
 
     @Test
@@ -193,7 +232,7 @@ public class DAOTest {
     @Test
     public void star() throws Exception {
         dao.headlineObservable(DAOParam.fromCategory(1, 0, 10)).repeat(5).blockingSubscribe();
-        Headline headline = dao.getHeadline(DAOParam.fromNewsId("201609130413080e91293fb5402b80437a65970fcb7d")).blockingGet();
+        Headline headline = dao.getHeadline(DAOParam.fromNewsId("201609130413080e91293fb5402b80437a65970fcb7d")).blockingGet();//may fail sometimes
         Log.i(TAG, "star: "+headline);
         assertEquals(headline.news_Title, "乐视921邀请函曝光 乐Pro 3悬疑即将揭晓");
 
