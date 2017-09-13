@@ -69,6 +69,7 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
     ImageButton weiBo;
     Button cancel;
     TextView article;
+    TextView headline;
     private Button collect;
     private Button speaker;
     private LinearLayout linearLayout;
@@ -84,6 +85,8 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
     private String shareContent = "";
     private SpeechSynthesizer mTts;
     private LinearLayout linearLayout1;
+    private LinearLayout linearLayout2;
+   // private SimpleDraweeView [] imageViews;
     //private TextView headline;
     private SingleObserver<? super News> subscriber = new SingleObserver<News>() {
         @Override
@@ -106,19 +109,18 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             pictures = news.news_Pictures;
             Log.d(TAG, "Pictues" + pictures);
             Log.d(TAG, news.news_Pictures);
-            int headlineLength = title.length();
-            String str = "";
+            //int headlineLength = title.length();
             //String str = title + "\n\n" + newsContent;     // ------------------
-            //headline.setText(title);
+            headline.setText(title);
             //newsContent += news.news_Content;
             //newsContent = newsContent.replaceAll("\\s*", "\\n");
             Log.d(TAG, newsContent);
 
             shareContent += ("标题：" + title + "\n" + "新闻详情：" + news.news_URL);
-            //Spannable textSpan = new SpannableStringBuilder(str);
-            //textSpan.setSpan(new AbsoluteSizeSpan(80), 0, headlineLength, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-            //textSpan.setSpan(new AbsoluteSizeSpan(50), headlineLength, str.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-            //article.setText(textSpan);
+            /*Spannable textSpan = new SpannableStringBuilder(str);
+            textSpan.setSpan(new AbsoluteSizeSpan(80), 0, headlineLength, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            textSpan.setSpan(new AbsoluteSizeSpan(50), headlineLength, str.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);*/
+            article.setText(newsContent);
             Log.d(TAG, "isFavourite" + isFavourite);
             if(isFavourite)
             {
@@ -126,18 +128,27 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             }
             else
                 collect.setText("收藏");
-            if(true)       // 无图模式的接口
+            if(BaseActivity.config_struct.picture_mode)       // 无图模式的接口
             {
                 String [] imgs = pictures.split("( )|(;)|(；)");
                 for(int i = 0; i < imgs.length; ++i)
                 {
                     if(!imgs[i].equals(""))
                     {
-                        Log.d(TAG, "Picture[" + i + "]: " + imgs[i]);
-                        /*Uri uri = Uri.parse(imgs[i]);
+                        Uri uri = Uri.parse(imgs[i]);
                         SimpleDraweeView image = new SimpleDraweeView(ArticleFragment.this);
+                        image.setMinimumHeight(600);
+                        image.setPadding(20, 20, 20, 20);
                         image.setImageURI(uri);
-                        linearLayout1.addView(image);*/
+                        if(i == 0)
+                        {
+                            linearLayout2.addView(image);
+                        }
+                        else
+                        {
+                            Log.d(TAG, "Picture[" + i + "]: " + imgs[i]);
+                            linearLayout1.addView(image);
+                        }
                     }
                 }
             }
@@ -172,15 +183,10 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
         Uri uri = Uri.parse("http://himg2.huanqiu.com/attachment2010/2016/0912/13/16/20160912011621140.png");
         //SimpleDraweeView image = new SimpleDraweeView(ArticleFragment.this);
         //image.setImageURI(uri);
-        linearLayout1 = (LinearLayout) findViewById(R.id.articlelinearlayout);
-        Button tmp = new Button(this);
-        tmp.setText("haipa");
+        //linearLayout1 = (LinearLayout) findViewById(R.id.articlelinearlayout);
+        //Button tmp = new Button(this);
+        //tmp.setText("haipa");
 
-        linearLayout1.addView(tmp);//, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        //tmp.setLayoutParams();
-        tmp.setWidth(100);
-        tmp.setHeight(100);
-        Log.i(TAG, "width " + tmp.getWidth());
 
         //updateArticleView(newsID);
         if(newsContent.equals(""))
@@ -230,7 +236,7 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
                     collect.setText("收藏");
                     isFavourite = false;
                     dao.unStar(newsID).subscribeOn(Schedulers.newThread()).subscribe();
-
+                    //BaseActivity.config_struct
                 }
                 else
                 {
@@ -288,12 +294,13 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
         LayoutInflater inflater = LayoutInflater.from(this);
         view = inflater.inflate(R.layout.popup, null);       // new View
 
-        //headline = (TextView) findViewById(R.id.headline);
+        headline = (TextView) findViewById(R.id.headline);
         textView = (TextView) findViewById(R.id.article);
         newsAuther = (TextView) findViewById(R.id.newsauther);
         back = (Button) findViewById(R.id.back);
         linearLayout = (LinearLayout) findViewById(R.id.linear);
-        //linearLayout1 = (LinearLayout) findViewById(R.id.articlelinearlayout);
+        linearLayout1 = (LinearLayout) findViewById(R.id.articlelinearlayout);
+        linearLayout2 = (LinearLayout) findViewById(R.id.articlelinearlayout1);
         weChatFriend = (ImageButton) view.findViewById(R.id.weChatFriend);
         //weChatZone = (ImageButton) view.findViewById(R.id.weChatZone);
         qq = (ImageButton) view.findViewById(R.id.qq);
@@ -301,6 +308,15 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
         cancel = (Button) view.findViewById(R.id.cancel);
         collect = (Button) view.findViewById(R.id.collect);
         //toolBar = (Toolbar) findViewById(R.id.toolbar1);
+        /*imageViews = new SimpleDraweeView[8];
+        imageViews[0] = (SimpleDraweeView) findViewById(R.id.image1);
+        imageViews[1] = (SimpleDraweeView) findViewById(R.id.image2);
+        imageViews[2] = (SimpleDraweeView) findViewById(R.id.image3);
+        imageViews[3] = (SimpleDraweeView) findViewById(R.id.image4);
+        imageViews[4] = (SimpleDraweeView) findViewById(R.id.image5);
+        imageViews[5] = (SimpleDraweeView) findViewById(R.id.image6);
+        imageViews[6] = (SimpleDraweeView) findViewById(R.id.image7);
+        imageViews[7] = (SimpleDraweeView) findViewById(R.id.image8);*/
     }
     private void initData()
     {
