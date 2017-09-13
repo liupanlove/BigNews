@@ -3,6 +3,8 @@ package bignews.myapplication;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,60 +15,52 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.SpeechSynthesizer;
+import com.iflytek.cloud.SpeechUtility;
+import com.iflytek.cloud.SynthesizerListener;
+
 import java.util.zip.Inflater;
 
-public class TestActivity extends Activity{
+public class TestActivity extends AppCompatActivity{
 
     private PopupWindow mPopWindow;
 
+        private SpeechSynthesizer mTts;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test);
 
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View view = inflater.inflate(R.layout.test1, (LinearLayout) findViewById(R.id.testLinearLayout));
-    }
-
-    /*private void showPopupWindow() {
-        //设置contentView
-        View contentView = LayoutInflater.from(TestActivity.this).inflate(R.layout.popuplayout, null);
-        mPopWindow = new PopupWindow(contentView,
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        mPopWindow.setContentView(contentView);
-        //设置各个控件的点击响应
-        TextView tv1 = (TextView)contentView.findViewById(R.id.pop_computer);
-        TextView tv2 = (TextView)contentView.findViewById(R.id.pop_financial);
-        TextView tv3 = (TextView)contentView.findViewById(R.id.pop_manage);
-        tv1.setOnClickListener(this);
-        tv2.setOnClickListener(this);
-        tv3.setOnClickListener(this);
-        //显示PopupWindow
-        View rootview = LayoutInflater.from(TestActivity.this).inflate(R.layout.main, null);
-        mPopWindow.showAtLocation(rootview, Gravity.BOTTOM, 0, 0);
+        Log.i("233",  "23333333");
+        SpeechUtility.createUtility(TestActivity.this, SpeechConstant.APPID + "=59b54aff"); // 56f22e12
+        // 1.创建SpeechSynthesizer对象, 第二个参数：本地合成时传InitListener
+        mTts = SpeechSynthesizer.createSynthesizer(TestActivity.this,
+                null);
+        // 2.合成参数设置，详见《科大讯飞MSC API手册(Android)》SpeechSynthesizer 类
+        mTts.setParameter(SpeechConstant.VOICE_NAME, "xiaoyan");// 设置发音人
+        mTts.setParameter(SpeechConstant.SPEED, "50");// 设置语速
+        mTts.setParameter(SpeechConstant.VOLUME, "80");// 设置音量，范围0~100
+        mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD); // 设置云端
+        // 设置合成音频保存位置（可自定义保存位置），保存在“./sdcard/iflytek.pcm”
+        // 保存在SD卡需要在AndroidManifest.xml添加写SD卡权限
+        // 如果不需要保存合成音频，注释该行代码
+        mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, "./sdcard/iflytek.pcm");
+        // 3.开始合成
 
     }
 
     @Override
-    public void onClick(View v) {
-        int id = v.getId();
-        switch (id){
-            case R.id.pop_computer:{
-                Toast.makeText(this,"clicked computer",Toast.LENGTH_SHORT).show();
-                mPopWindow.dismiss();
+    public void onResume()
+    {
+        super.onResume();
+        Button btn = (Button) findViewById(R.id.btn);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mTts.startSpeaking("中华人民共和国，中华人民共和国，中华人民共和国，中华人民共和国，中华人民共和国，中华人民共和国，中华人民共和国", null);
             }
-            break;
-            case R.id.pop_financial:{
-                Toast.makeText(this,"clicked financial",Toast.LENGTH_SHORT).show();
-                mPopWindow.dismiss();
-            }
-            break;
-            case R.id.pop_manage:{
-                Toast.makeText(this,"clicked manage",Toast.LENGTH_SHORT).show();
-                mPopWindow.dismiss();
-            }
-            break;
-        }
+        });
     }
-    */
 }
