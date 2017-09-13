@@ -48,13 +48,19 @@ public class TestActivity extends AppCompatActivity{
         // 如果不需要保存合成音频，注释该行代码
         mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, "./sdcard/iflytek.pcm");
         // 3.开始合成
+
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
         Button btn = (Button) findViewById(R.id.btn);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mTts.startSpeaking("我爱你", null);
+                mTts.startSpeaking("中华人民共和国，中华人民共和国，中华人民共和国，中华人民共和国，中华人民共和国，中华人民共和国，中华人民共和国", null);
             }
         });
-
     }
 }
