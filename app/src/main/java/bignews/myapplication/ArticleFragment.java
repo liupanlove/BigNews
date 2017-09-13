@@ -14,8 +14,10 @@ import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.text.style.AbsoluteSizeSpan;
 import android.util.Log;
@@ -89,6 +91,7 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
     private SpeechSynthesizer mTts;
     private LinearLayout linearLayout1;
     private LinearLayout linearLayout2;
+    private String newNewsContent;
    // private SimpleDraweeView [] imageViews;
     //private TextView headline;
     private SingleObserver<? super News> subscriber = new SingleObserver<News>() {
@@ -110,21 +113,24 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             auther = news.news_Author;
             newsAuther.setText(auther);
             pictures = news.news_Pictures;
-            Log.d(TAG, "Pictues" + pictures);
-            Log.d(TAG, news.news_Pictures);
+            //Log.d(TAG, "Pictues" + pictures);
+            //Log.d(TAG, news.news_Pictures);
             //int headlineLength = title.length();
             //String str = title + "\n\n" + newsContent;     // ------------------
             headline.setText(title);
             //newsContent += news.news_Content;
             //newsContent = newsContent.replaceAll("\\s*", "\\n");
-            Log.d(TAG, newsContent);
-
+            Log.d(TAG, "害怕" + newsContent);
+            newNewsContent = newsContent.replaceAll("<.*?>", "");
+            Log.d(TAG, "害怕" + newNewsContent);
             shareContent += ("标题：" + title + "\n" + "新闻详情：" + news.news_URL);
             /*Spannable textSpan = new SpannableStringBuilder(str);
             textSpan.setSpan(new AbsoluteSizeSpan(80), 0, headlineLength, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
             textSpan.setSpan(new AbsoluteSizeSpan(50), headlineLength, str.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);*/
-            article.setText(newsContent);
-            Log.d(TAG, "isFavourite" + isFavourite);
+            article.setText(Html.fromHtml(newsContent));
+            article.setMovementMethod(LinkMovementMethod.getInstance());
+
+            //Log.d(TAG, "isFavourite" + isFavourite);
             if(isFavourite)
             {
                 collect.setText("取消收藏");
@@ -183,7 +189,7 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
 
         newsID = intent.getStringExtra(ARG_POSITION);
         Log.i(TAG, newsID);
-        Uri uri = Uri.parse("http://himg2.huanqiu.com/attachment2010/2016/0912/13/16/20160912011621140.png");
+        //Uri uri = Uri.parse("http://himg2.huanqiu.com/attachment2010/2016/0912/13/16/20160912011621140.png");
         //SimpleDraweeView image = new SimpleDraweeView(ArticleFragment.this);
         //image.setImageURI(uri);
         //linearLayout1 = (LinearLayout) findViewById(R.id.articlelinearlayout);
@@ -233,7 +239,7 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             {
                 //tts.speak(newsContent, TextToSpeech.QUEUE_ADD, null); //"1月1日，这是元旦节
                 //     "
-                mTts.startSpeaking(newsContent, null);
+                mTts.startSpeaking(newNewsContent, null);
             }
         });
     }
