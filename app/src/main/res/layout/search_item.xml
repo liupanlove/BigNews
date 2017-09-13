@@ -24,4 +24,13 @@
         android:textColor="@color/colorText"
         android:textSize="15sp"
         android:padding="20dp"/>
+    <TextView
+        android:id="@+id/introduction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:typeface="monospace"
+        android:textColor="@color/colorText"
+        android:textSize="15sp"
+        android:padding="20dp"/>
 </LinearLayout>

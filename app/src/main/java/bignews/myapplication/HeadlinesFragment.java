@@ -1,7 +1,5 @@
 package bignews.myapplication;
 
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,25 +8,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import bignews.myapplication.db.DAO;
 
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import bignews.myapplication.db.DAOParam;
 import bignews.myapplication.db.Headline;
-import bignews.myapplication.utils.HeadlineAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Single;
@@ -101,6 +93,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         Log.i(TAG, "ArticleClick");
         mCallback = (OnHeadlineSelectedListener)getActivity();
         Log.i(TAG, news.get((int)id).news_ID);
+        news.get(position - 1).isVisited = true;
         mCallback.onArticleSelected((news.get(position - 1).news_ID));  // Integer.parseInt
     }
 
@@ -111,7 +104,13 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         if(getArguments()!=null){
             mText = getArguments().getString("text");
             mID = getArguments().getInt("id");
-            headlineObservable = dao.headlineObservable(DAOParam.fromCategory(mID, 0, LIMIT));
+
+            if(mID == -2)
+            {
+                headlineObservable = dao.headlineObservable(DAOParam.fromKeyword(mText, 0, LIMIT));
+            }
+            else
+                headlineObservable = dao.headlineObservable(DAOParam.fromCategory(mID, 0, LIMIT));
         }
         if (news.size() == 0)
             loadNewsData();
@@ -161,11 +160,14 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     }
 
     private void loadNewsData() {//!!!BUG
-        final DAOParam param;
+        /*final DAOParam param;
         if(mID == -2)
+        {
             param = DAOParam.fromKeyword(mText, news.size(), LIMIT);
+            Log.i(TAG, "害怕");
+        }
         else
-            param = DAOParam.fromCategory(mID, news.size(), LIMIT);
+            param = DAOParam.fromCategory(mID, news.size(), LIMIT);*/
         //news = dao.getHeadlineList(param);
         /*Single.create(new SingleOnSubscribe<ArrayList<Headline>>() {
             @Override
@@ -185,6 +187,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onPause() {
         super.onPause();
+        listView.onRefreshComplete();
         if (disposable != null) {
             Log.i(TAG, "onPause: " + mText + " Disposing.");
             disposable.dispose();

@@ -52,6 +52,7 @@ public class ConfigActivity extends BaseActivity {
                     ((ImageButton)view).setImageResource(R.drawable.yes_picture);
                 BaseActivity.config_struct.picture_mode = !BaseActivity.config_struct.picture_mode;
                 BaseActivity.config_struct.push_data();
+                BaseActivity.config_struct.class_changed = true;
             }
         });
         ImageButton check_day_mode = (ImageButton)findViewById(R.id.check_day_mode);
@@ -60,11 +61,11 @@ public class ConfigActivity extends BaseActivity {
             public void onClick(View view) {
                 BaseActivity.config_struct.day_mode = !BaseActivity.config_struct.day_mode;
                 if (!BaseActivity.config_struct.day_mode) {
-                    //mUiModeManager.enableCarMode(0);
+                    mUiModeManager.enableCarMode(0);
                     mUiModeManager.setNightMode(UiModeManager.MODE_NIGHT_YES);
                 }
                 else{
-                    //mUiModeManager.disableCarMode(0);
+                    mUiModeManager.disableCarMode(0);
                     mUiModeManager.setNightMode(UiModeManager.MODE_NIGHT_NO);
                 }
                 BaseActivity.config_struct.push_data();
