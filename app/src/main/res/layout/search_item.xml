@@ -6,7 +6,10 @@
     android:layout_width="match_parent"
     android:orientation = "vertical"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:background="@color/colorBackground">
+    android:background="@color/colorBackground"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:elevation="4dip">
 
 
     <com.facebook.drawee.view.SimpleDraweeView
@@ -24,6 +27,7 @@
         android:textColor="@color/colorText"
         android:textSize="18sp"
         android:padding="5dp"
+        android:paddingTop="15dp"
 
         android:textStyle="bold"/>
     <TextView
@@ -34,5 +38,6 @@
         android:typeface="monospace"
         android:textColor="@color/colorText"
         android:textSize="15sp"
-        android:padding="5dp"/>
+        android:padding="5dp"
+        android:paddingBottom="25dp"/>
 </LinearLayout>

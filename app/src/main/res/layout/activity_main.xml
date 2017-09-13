@@ -24,13 +24,16 @@
 
         <FrameLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="0.08"
             android:layout_marginRight="8dp">  <!--没什么卵用 -->
-            <ImageView
+            <ImageButton
+                android:id="@+id/config_button"
+                android:background="@color/colorPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/plus"/>
+                android:src="@drawable/config5"
+                android:scaleType="fitCenter"/>
         </FrameLayout>
     </LinearLayout>
 

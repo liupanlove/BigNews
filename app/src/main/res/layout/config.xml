@@ -3,13 +3,14 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="top"
-    android:padding="20px"
+    android:paddingLeft="20px"
+    android:paddingRight="20px"
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:background="@color/colorBackground">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="200px"
+        android:layout_height="250px"
         android:orientation="horizontal">
         <ImageButton
             android:layout_width="0dp"
@@ -28,16 +29,6 @@
             android:layout_weight="1"
             android:backgroundTint="#00000000"/>
     </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/gray" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="新闻类别"
-        android:textSize = "20dp"
-        android:textColor="@color/colorText"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

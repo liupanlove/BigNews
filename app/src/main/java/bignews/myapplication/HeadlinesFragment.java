@@ -40,6 +40,8 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     private static final int LIMIT = 5;
     DAO dao = DAO.getInstance(); //should be a singleton.
     Single<ArrayList<Headline>> headlineObservable = null;
+    boolean loading_data = false;
+    boolean created = false;
 
 
     private int mode;
@@ -67,12 +69,14 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
             //adapter.addAll(strings);
             adapter.notifyDataSetChanged();
             listView.onRefreshComplete();
+            loading_data = false;
         }
 
         @Override
         public void onError(@NonNull Throwable e) {
             Log.i(TAG, "onError: "+Log.getStackTraceString(e));
             listView.onRefreshComplete();
+            loading_data = false;
         }
     };
     private Disposable disposable;
@@ -101,6 +105,8 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     public void onCreate(@Nullable Bundle bundle) {
         Log.i("Err", "onCreate: "+mText);
         super.onCreate(bundle);
+        if (created) return;
+        created = true;
         if(getArguments()!=null){
             mText = getArguments().getString("text");
             mID = getArguments().getInt("id");
@@ -176,6 +182,8 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
             }
         })*/
         //dao.getHeadlineList(param)
+        if (loading_data) return;
+        loading_data = true;
         headlineObservable
                 .timeout(3, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.newThread())

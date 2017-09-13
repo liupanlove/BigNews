@@ -9,6 +9,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ public class MainActivity extends BaseActivity
     private static final String TAG = "MainActivity";
     private Vector<Fragment> fragments;
     private TabFragmentAdapter tab_adapter;
+    Intent config_intent;
     public void refreshTag() {
 //        for (int i = fragments.size() - 1; i >= 0; --i) {
 //            String tag = fragments.get(i).getArguments().getString("text");
@@ -79,6 +82,14 @@ public class MainActivity extends BaseActivity
         setContentView(R.layout.activity_main);
 
         DAO.init(getApplicationContext());
+        ImageButton config_button = (ImageButton)findViewById(R.id.config_button);
+        config_intent = new Intent(this, ConfigActivity.class);
+        config_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(config_intent);
+            }
+        });
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         fragments = new Vector<>();

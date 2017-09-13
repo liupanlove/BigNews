@@ -3,6 +3,7 @@
     <color name="colorPrimary">#0066cc</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorBackground">#ffffff</color>
+    <color name="colorBackBackground">#f3f3f3</color>
     <color name="colorBackgroundGray">#cccccc</color>
     <color name="colorBackgroundVisited">#aaaaaa</color>
     <color name="colorText">#000000</color>
