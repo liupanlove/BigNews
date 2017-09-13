@@ -175,6 +175,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onPause() {
         super.onPause();
+        listView.onRefreshComplete();
         if (disposable != null) {
             Log.i(TAG, "onPause: " + mText + " Disposing.");
             disposable.dispose();
