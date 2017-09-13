@@ -85,7 +85,7 @@ public class DAOTest {
     @Test
     public void recommendation() throws Exception {
         dao.headlineObservable(DAOParam.fromCategory(DAOParam.RECOMMENDATION, 0, 10)).blockingGet();
-        dao.headlineObservable(DAOParam.fromCategory(1, 0, 10))
+        dao.headlineObservable(DAOParam.fromCategory(1, 0, 2))
                 .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {
                     @Override
                     public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines) throws Exception {
@@ -98,14 +98,34 @@ public class DAOTest {
                         return headlines;
                     }
                 }).blockingGet();
+        Single<ArrayList<Headline>> single = dao.headlineObservable(DAOParam.fromCategory(DAOParam.RECOMMENDATION, 0, 10));
+        Log.i(TAG, "recommendation: first");
+        single.blockingGet();
+        dao.headlineObservable(DAOParam.fromCategory(2, 0, 10))
+                .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {
+                    @Override
+                    public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines) throws Exception {
+                        Log.i(TAG, "apply: get all news begin");
+                        for (Headline headline :
+                                headlines) {
+                            dao.getNews(DAOParam.fromNewsId(headline.news_ID)).subscribe();
+                        }
+                        Log.i(TAG, "apply: get all news end");
+                        return headlines;
+                    }
+                }).blockingGet();
+        Log.i(TAG, "recommendation: second");
         dao.headlineObservable(DAOParam.fromCategory(DAOParam.RECOMMENDATION, 0, 10)).blockingGet();
+        Log.i(TAG, "recommendation: third");
+        single.blockingGet();
     }
 
     @Test
     public void url() throws Exception {
         News news = dao.getNews(DAOParam.fromNewsId("201608090432c815a85453c34d8ca43a591258701e9b")).blockingGet();
-        Log.i(TAG, "url: "+news.news_Content);
-        assertNotEquals(-1, news.news_Content.indexOf("href"));
+        Log.i(TAG, "url: origin content: "+news.news_Content);
+        Log.i(TAG, "url: html content: "+news.news_HTMLContent);
+        assertNotEquals(-1, news.news_HTMLContent.indexOf("href"));
 
     }
 

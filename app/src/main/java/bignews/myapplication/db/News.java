@@ -16,6 +16,7 @@ public class News extends Headline {
     @Ignore
     ArrayList<Person> persons;
     public String news_Content;
+    public String news_HTMLContent;
     //ArrayList<String> persons;
     //public ArrayList<String> seggedPListOfContent;
     @Ignore
