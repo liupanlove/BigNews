@@ -12,7 +12,7 @@
         android:layout_height="200px"
         android:orientation="horizontal">
         <ImageButton
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:src="@drawable/day"
             android:id="@+id/check_day_mode"
@@ -20,7 +20,7 @@
             android:layout_weight="1"
             android:backgroundTint="#00000000"/>
         <ImageButton
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:src="@drawable/yes_picture"
             android:id="@+id/check_picture_mode"

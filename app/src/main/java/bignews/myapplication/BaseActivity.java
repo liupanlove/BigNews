@@ -75,8 +75,10 @@ class ConfigStruct {
     public void refresh_tag_list() {
         tag_list.clear();
         tag_id_list.clear();
+        tag_id_list.add(-3);
         tag_id_list.add(0);
         tag_id_list.add(-1);
+        tag_list.add("历史");
         tag_list.add("推荐");
         tag_list.add("收藏");
         for (int i = 0; i < 12; ++i)

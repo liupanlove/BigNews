@@ -105,6 +105,7 @@ public class MainActivity extends BaseActivity
         Log.i(TAG, "onCreate: "+fragments.size());
         tab_adapter = new TabFragmentAdapter(fragments, BaseActivity.config_struct.tag_list, getSupportFragmentManager(), this);
         viewPager.setAdapter(tab_adapter);
+        viewPager.setCurrentItem(1);
         // 初始化
         TabLayout tablayout = (TabLayout) findViewById(R.id.tablayout);
 // 将ViewPager和TabLayout绑定
