@@ -41,6 +41,7 @@ class ConfigStruct {
     public boolean picture_mode;
     public boolean day_mode;
     public boolean class_changed;
+    public boolean favorite_changed;
     public Vector<Integer> tag_id_list;
     public Vector<String> tag_list;
     public Vector<String> class_data;
@@ -49,6 +50,7 @@ class ConfigStruct {
         picture_mode = true;
         day_mode = true;
         class_changed = false;
+        favorite_changed = false;
         class_data = new Vector<>();
         class_data.add("科技");
         class_data.add("教育");
@@ -73,10 +75,10 @@ class ConfigStruct {
     public void refresh_tag_list() {
         tag_list.clear();
         tag_id_list.clear();
-        tag_id_list.add(-1);
         tag_id_list.add(0);
-        tag_list.add("主页");
+        tag_id_list.add(-1);
         tag_list.add("推荐");
+        tag_list.add("收藏");
         for (int i = 0; i < 12; ++i)
             if (class_use.get(i)) {
                 tag_id_list.add(i + 1);
