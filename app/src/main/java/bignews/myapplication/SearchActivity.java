@@ -1,6 +1,7 @@
 package bignews.myapplication;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -33,6 +35,7 @@ public class SearchActivity extends AppCompatActivity implements HeadlinesFragme
     private  SimpleAdapter adapter;
     private String queryContent;
     private final int id = -2;
+    private LinearLayout mainLinearLayout;
 
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -55,7 +58,7 @@ public class SearchActivity extends AppCompatActivity implements HeadlinesFragme
         adapter = new SimpleAdapter(this, listItems, R.layout.search_item,
                 new String[]{"title", "image"}, new int[]{R.id.title, R.id.image});
         listView.setAdapter(adapter);*/
-
+        mainLinearLayout = (LinearLayout) findViewById(R.id.mainlinearlayout);
         searchView = (SearchView) findViewById(R.id.searchview1);
         getMessage();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -63,6 +66,10 @@ public class SearchActivity extends AppCompatActivity implements HeadlinesFragme
             public boolean onQueryTextSubmit(String s) {
                 showContent(s);
                 Log.i(TAG, "onQueryTextSubmit" + s );
+                mainLinearLayout.requestFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+
                 return true;
             }
 
@@ -78,15 +85,23 @@ public class SearchActivity extends AppCompatActivity implements HeadlinesFragme
         searchView1.requestFocusFromTouch();*/
     }
 
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        //mainLinearLayout.requestFocus();
+    }
     private void getMessage()
     {
         Intent intent = getIntent();
         String query = intent.getStringExtra("querycontent");
         searchView.setQuery(query, true);
-        searchView.setIconifiedByDefault(true);
-        searchView.setFocusable(true);
+        //searchView.setIconifiedByDefault(true);
+        //searchView.setFocusable(true);
         searchView.setIconified(false);
-        searchView.requestFocusFromTouch();
+        //searchView.clearFocus();
+        searchView.setFocusable(false);
+        mainLinearLayout.requestFocus();
         showContent(query);
     }
 
@@ -106,6 +121,7 @@ public class SearchActivity extends AppCompatActivity implements HeadlinesFragme
     }
     private void showContent(String query)
     {
+        //mainLinearLayout.requestFocus();
         //getSupportFragmentManager().findFragmentById("f1").
         Log.i(TAG, "queryContent" + query);
 

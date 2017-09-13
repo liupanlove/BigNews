@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -121,6 +122,7 @@ public class BaseActivity extends AppCompatActivity {
     private Toolbar toolBar;
     private Intent config_intent;
     final static public ConfigStruct config_struct = new ConfigStruct();
+    private LinearLayout linearLayout;
     private UiModeManager mUiModeManager = null;
 
     @Override
@@ -129,7 +131,7 @@ public class BaseActivity extends AppCompatActivity {
         initContentView(R.layout.base_layout);
         DAO.init(getApplicationContext());
         config_struct.refresh_data();
-        
+        linearLayout = (LinearLayout) findViewById(R.id.baselinearlayout);
 	    ImageButton config_button = (ImageButton)findViewById(R.id.config_botton);
         config_intent = new Intent(this, ConfigActivity.class);
         config_button.setOnClickListener(new View.OnClickListener() {
@@ -170,7 +172,7 @@ public class BaseActivity extends AppCompatActivity {
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar,menu);
+        getMenuInflater().inflate(R.menu.toolbar, menu);
         setSearchView(menu);
         /**
          * 关联检索配置和SearchView
@@ -206,7 +208,7 @@ public class BaseActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
 
-                Log.e("onQueryTextChange","我是内容改变");
+                Log.e("onQueryTextChange","搜索内容为：" + newText);
                 return false;
             }
         });
@@ -246,6 +248,10 @@ public class BaseActivity extends AppCompatActivity {
     {
         Intent intent = new Intent(this, SearchActivity.class);
         intent.putExtra("querycontent", query);
+        linearLayout.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+
         startActivity(intent);
     }
 
