@@ -16,9 +16,11 @@ public class Headline {
     public String news_ID;
     public String newsClassTag, news_Category, news_Source, news_Title, news_URL, news_Author, lang_Type,
             news_Pictures, news_Video, news_Intro;
-    @TypeConverters({Converters.class})
+    //@TypeConverters({Converters.class})
     public String news_Time;
     public boolean isFavorite;
+    @TypeConverters({Converters.class})
+    public Date updated_time;
 
     @Override
     public String toString() {
@@ -26,7 +28,9 @@ public class Headline {
                 "news_ID='" + news_ID + '\'' +
                 ", newsClassTag='" + newsClassTag + '\'' +
                 ", news_Title='" + news_Title + '\'' +
+                ", news_Time='" + news_Time + '\'' +
                 ", isFavorite=" + isFavorite +
+                ", updated_time='" + updated_time + '\'' +
                 ", isVisited=" + isVisited +
                 '}';
     }

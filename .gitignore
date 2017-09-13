@@ -174,3 +174,4 @@ lib/pull/build
 /build
 /captures
 .externalNativeBuild
+app/schemas/

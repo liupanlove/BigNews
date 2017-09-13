@@ -40,6 +40,10 @@ public interface HeadlineDao {
     @Query("select * FROM Headline where news_Id = :newsID")
     Single<List<Headline>> findHeadlineByID(String newsID);
 
-    @Query("select * FROM Headline where isFavorite = 1 order by news_Time desc limit :limit offset :offset")
+    @Query("select * FROM Headline where isFavorite = 1 order by updated_time desc limit :limit offset :offset")
     Single<List<Headline>> findHeadlineByFavorite(int offset, int limit);
+
+    @Query("select * from Headline where news_ID in"
+        +  "(select news_ID from News) order by updated_time desc limit :limit offset :offset")
+    Single<List<Headline>> loadHistory(int offset, int limit);
 }

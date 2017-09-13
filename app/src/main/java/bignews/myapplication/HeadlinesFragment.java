@@ -68,15 +68,18 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
         @Override
         public void onSuccess(@NonNull ArrayList<Headline> strings) {
+            Log.i(TAG, "onSuccess: loadNewsDatasuccess "+mText+" "+strings);
             news.addAll(strings);
+            //news.addAll(strings);
+            //adapter.clear();
+            //adapter.addAll(strings);
             adapter.notifyDataSetChanged();
             listView.onRefreshComplete();
-            Log.i(TAG, "onSuccess: loadNewsDatasuccess "+mText+" "+news);
         }
 
         @Override
         public void onError(@NonNull Throwable e) {
-            Log.d(TAG, "onError: "+Log.getStackTraceString(e));
+            Log.i(TAG, "onError: "+Log.getStackTraceString(e));
             listView.onRefreshComplete();
         }
     };

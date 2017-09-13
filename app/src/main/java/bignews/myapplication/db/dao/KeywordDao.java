@@ -17,7 +17,7 @@ import io.reactivex.Single;
 @Dao
 public interface KeywordDao {
 
-    @Query("select * from Keyword order by score desc limit 1 ")
+    @Query("select * from Keyword order by score desc limit 3 ")
     Single<List<Keyword>> getHighFreqWord();
 
     @Query("select * from Keyword where word = :word limit 1 ")

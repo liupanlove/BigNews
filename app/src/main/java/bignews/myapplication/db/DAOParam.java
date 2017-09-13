@@ -5,6 +5,7 @@ package bignews.myapplication.db;
  */
 
 public class DAOParam {
+    public static final int HISTORY = -3;
     public static final int FAVORITE = -1;
     public static final int RECOMMENDATION = 0;
     /**
