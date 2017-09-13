@@ -27,20 +27,20 @@ public class MainActivity extends BaseActivity
     private Vector<Fragment> fragments;
     private TabFragmentAdapter tab_adapter;
     public void refreshTag() {
-        Log.v("Err", "244");
-        for (int i = fragments.size() - 1; i >= 0; --i) {
-            String tag = fragments.get(i).getArguments().getString("text");
-            boolean got = false;
-            for (int j = 0; j < BaseActivity.config_struct.tag_list.size(); ++j)
-                if (BaseActivity.config_struct.tag_list.get(j).equals(tag)) {
-                    got = true;
-                    break;
-                }
-            if (!got) {
-                Log.v("Err", tag);
-                fragments.remove(i);
-            }
-        }
+//        for (int i = fragments.size() - 1; i >= 0; --i) {
+//            String tag = fragments.get(i).getArguments().getString("text");
+//            boolean got = false;
+//            for (int j = 0; j < BaseActivity.config_struct.tag_list.size(); ++j)
+//                if (BaseActivity.config_struct.tag_list.get(j).equals(tag)) {
+//                    got = true;
+//                    break;
+//                }
+//            if (!got) {
+//                Log.v("Err", tag);
+//                fragments.remove(i);
+//            }
+//        }
+        fragments.clear();
         for (int i = 0; i < BaseActivity.config_struct.tag_list.size(); ++i) {
             String tag = BaseActivity.config_struct.tag_list.get(i);
             boolean got = false;
@@ -54,6 +54,7 @@ public class MainActivity extends BaseActivity
                 Fragment fragment = new HeadlinesFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString("text",tag);
+                bundle.putInt("id",BaseActivity.config_struct.tag_id_list.get(i));
                 fragment.setArguments(bundle);
                 fragments.add(fragment);
             }
@@ -64,10 +65,12 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if (BaseActivity.config_struct.class_changed) {
+        if (BaseActivity.config_struct.class_changed || BaseActivity.config_struct.favorite_changed) {
             BaseActivity.config_struct.class_changed = false;
+            BaseActivity.config_struct.favorite_changed = false;
             refreshTag();
         }
+        tab_adapter.notifyDataSetChanged();
     }
 
     @Override

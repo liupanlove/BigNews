@@ -52,6 +52,7 @@ public class ConfigActivity extends BaseActivity {
                     ((ImageButton)view).setImageResource(R.drawable.yes_picture);
                 BaseActivity.config_struct.picture_mode = !BaseActivity.config_struct.picture_mode;
                 BaseActivity.config_struct.push_data();
+                BaseActivity.config_struct.class_changed = true;
             }
         });
         ImageButton check_day_mode = (ImageButton)findViewById(R.id.check_day_mode);

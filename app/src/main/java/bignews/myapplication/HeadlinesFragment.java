@@ -1,7 +1,5 @@
 package bignews.myapplication;
 
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,25 +8,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import bignews.myapplication.db.DAO;
 
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import bignews.myapplication.db.DAOParam;
 import bignews.myapplication.db.Headline;
-import bignews.myapplication.utils.HeadlineAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Single;
@@ -98,6 +90,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         Log.i(TAG, "ArticleClick");
         mCallback = (OnHeadlineSelectedListener)getActivity();
         Log.i(TAG, news.get((int)id).news_ID);
+        news.get(position - 1).isVisited = true;
         mCallback.onArticleSelected((news.get(position - 1).news_ID));  // Integer.parseInt
     }
 

@@ -1,5 +1,6 @@
-package bignews.myapplication.utils;
+package bignews.myapplication;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,9 +10,11 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.iflytek.cloud.resource.Resource;
 
 import java.util.List;
 
+import bignews.myapplication.BaseActivity;
 import bignews.myapplication.MainActivity;
 import bignews.myapplication.R;
 import bignews.myapplication.db.Headline;
@@ -50,12 +53,18 @@ public class HeadlineAdapter extends BaseAdapter {
         View view = null;
         view = inflater.inflate(R.layout.search_item, null);
         Headline u = headlines.get(i);
+        if (u.isVisited)
+            view.setBackgroundColor(inflater.getContext().getResources().getColor(R.color.colorBackgroundVisited));
+        else
+            view.setBackgroundColor(inflater.getContext().getResources().getColor(R.color.colorBackground));
 
         //通过回调这个方法传过来的position参数获取到指定数据源中的对象
         //找到布局文件中的控件
         TextView title = (TextView) view.findViewById(R.id.title);
+        TextView introduction = (TextView) view.findViewById(R.id.introduction);
         SimpleDraweeView image = (SimpleDraweeView) view.findViewById(R.id.image);
         title.setText(u.news_Title);
+        introduction.setText(u.news_Intro);
         String[] imgs = u.news_Pictures.split("( )|(;)");
         String img = "";
         for (int j = 0; j < imgs.length; ++j)
@@ -64,9 +73,9 @@ public class HeadlineAdapter extends BaseAdapter {
                 break;
             }
 
-        if (!img.equals("")) {
-            Uri uri = Uri.parse(imgs[0]);
-            Log.v("Err", i + "  " + imgs[0]);
+        if (!img.equals("") && BaseActivity.config_struct.picture_mode) {
+            Uri uri = Uri.parse(img);
+            Log.v("Err", i + "  " + img);
             image.setImageURI(uri);
         } else {
             image.setVisibility(View.GONE);
