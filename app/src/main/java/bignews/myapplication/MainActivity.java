@@ -73,7 +73,7 @@ public class MainActivity extends BaseActivity
             BaseActivity.config_struct.favorite_changed = false;
             refreshTag();
         }
-        tab_adapter.notifyDataSetChanged();
+        //tab_adapter.notifyDataSetChanged();
     }
 
     @Override

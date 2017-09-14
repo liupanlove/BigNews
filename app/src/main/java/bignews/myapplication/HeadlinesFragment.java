@@ -101,11 +101,13 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         Log.i(TAG, news.get((int)id).news_ID);
         news.get(position - 1).isVisited = true;
         mCallback.onArticleSelected((news.get(position - 1).news_ID));  // Integer.parseInt
+        view.setBackgroundColor(getContext().getResources().getColor(R.color.colorBackgroundVisited));
     }
 
     @Override
     public void onCreate(@Nullable Bundle bundle) {
         super.onCreate(bundle);
+        adapter = new HeadlineAdapter(getActivity().getLayoutInflater(), news);
         Log.i("Err", "onCreate: "+mText+" "+created+" "+news);
         if (created) return;
         created = true;
@@ -149,7 +151,6 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
         listView.setOnItemClickListener(this);
 
-        adapter = new HeadlineAdapter(getActivity().getLayoutInflater(), news);
         listView.setAdapter(adapter);
         return view;
     }
@@ -158,6 +159,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     public void onResume() {
         Log.i(TAG, "onResume: "+mText+" "+news.size());
         super.onResume();
+        //adapter.notifyDataSetChanged();
         if (news.size() == 0) {
             //listView.setRefreshing();
             loadNewsData();
