@@ -156,7 +156,7 @@ public class DAO {
                     @Override
                     public void accept(ArrayList<Headline> headlines) throws Exception {
                         Log.i(TAG, "doAfterSuccess: " + headlines);
-                        param.offset += param.limit;
+                        param.offset += headlines.size();
                         Log.i(TAG, "doAfterSuccess: " + param);
                         Log.i(TAG, "doAfterSuccess insert into Headline Database begin");
                         for (Headline headline : headlines)
