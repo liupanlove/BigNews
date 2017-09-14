@@ -204,6 +204,7 @@ public class DAO {
                     public News apply(@NonNull News news) throws Exception {
                         Log.i(TAG, "fetchFromAPI: begin");
                         sort(news.persons);
+                        news.news_HTMLContent = new String(news.news_Content);
                         for (News.Person person:
                                 news.persons) { //add baidu baidke link
                             String encoded = URLEncoder.encode(person.word, "UTF-8");

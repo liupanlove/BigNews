@@ -127,6 +127,12 @@ public class DAOTest {
         Log.i(TAG, "url: html content: "+news.news_HTMLContent);
         assertNotEquals(-1, news.news_HTMLContent.indexOf("href"));
 
+        news = dao.getNews(DAOParam.fromNewsId("2015081207130cb08da174e444b993f10b40be057ffd")).blockingGet();
+        Log.i(TAG, "url: origin content: "+news.news_Content);
+        Log.i(TAG, "url: html content: "+news.news_HTMLContent);
+        assertEquals(news.news_Content, news.news_HTMLContent);
+
+
     }
 
     @Test
