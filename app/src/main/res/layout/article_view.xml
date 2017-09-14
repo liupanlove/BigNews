@@ -107,6 +107,7 @@
                 android:textSize="18sp"
                 android:textColor = "@android:color/black"
                 android:background="@color/littlegray"
+                android:lineSpacingExtra = "3dp"
                 /> <!--android:scrollbars = "vertical"
                 android:fadeScrollbars="false"-->
         </LinearLayout>

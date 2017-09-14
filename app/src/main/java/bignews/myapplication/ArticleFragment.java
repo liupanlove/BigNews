@@ -92,6 +92,7 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
     private LinearLayout linearLayout1;
     private LinearLayout linearLayout2;
     private String newsHTMLContent;
+    private boolean isSpeaking = false;
    // private SimpleDraweeView [] imageViews;
     //private TextView headline;
     private SingleObserver<? super News> subscriber = new SingleObserver<News>() {
@@ -122,7 +123,10 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             //newsContent = newsContent.replaceAll("\\s*", "\\n");
             //Log.d(TAG, "害怕" + newsContent);
             newsHTMLContent = news.news_HTMLContent;
-            //Log.d(TAG, "害怕" + newNewsContent);
+
+            //
+            //newsHTMLContent = newsHTMLContent.replaceAll("  ", "<br>");
+            Log.d(TAG, "害怕" + newsHTMLContent);
             shareContent += ("标题：" + title + "\n" + "新闻详情：" + news.news_URL);
             /*Spannable textSpan = new SpannableStringBuilder(str);
             textSpan.setSpan(new AbsoluteSizeSpan(80), 0, headlineLength, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
@@ -236,9 +240,26 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             {
                 //tts.speak(newsContent, TextToSpeech.QUEUE_ADD, null); //"1月1日，这是元旦节
                 //     "
-                Log.i(TAG, "mTts startSpeaking");
-                mTts.startSpeaking(newsContent, null);
-                Log.i(TAG, "mTts startSpeaking end");
+
+                if(isSpeaking)
+                {
+                    if(mTts != null)
+                    {
+                        mTts.stopSpeaking();
+                        mTts.destroy();
+                        Toast.makeText(getApplicationContext(), "停止语音播报", Toast.LENGTH_SHORT).show();
+                    }
+                    isSpeaking = false;
+                }
+                else
+                {
+                    Log.i(TAG, "mTts startSpeaking");
+                    mTts.startSpeaking(newsContent, null);
+                    Log.i(TAG, "mTts startSpeaking end");
+                    Toast.makeText(getApplicationContext(), "开始语音播报", Toast.LENGTH_SHORT).show();
+                    isSpeaking = true;
+                }
+
             }
         });
     }
