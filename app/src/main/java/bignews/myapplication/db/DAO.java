@@ -31,6 +31,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import retrofit2.http.HEAD;
 
 import static java.util.Collections.sort;
 
@@ -108,85 +109,42 @@ public class DAO {
                     @Override
                     public Headline apply(@NonNull List<Headline> headlines) throws Exception {
                         if (headlines.size() == 0) throw new RuntimeException("No such headline.");
+                        Log.i(TAG, "apply: check if visited");
+                        for (Headline headline : headlines)
+                            headline.isVisited = !newsDao.findByID(headline.news_ID)
+                                    .blockingGet().isEmpty();
                         return headlines.get(0);
                     }
                 });
     }
 
-    Single<ArrayList<Headline>> headlineObservableTest(final DAOParam param) {
-        if (!(param.category != DAOParam.FAVORITE && param.category != DAOParam.RECOMMENDATION))
-            throw new AssertionError("Neither favorite nor recommendation is supported now");
-        //Integer category = param.category;
-        //Integer offset = 0;
-        //Integer limit = param.limit;
-        //int pageSize = -10;
-        //int pageNo = -10;
-        return Single.create(new SingleOnSubscribe<ArrayList<Headline>>() {
-            //int category = param.category;
-            //int offset = 0;
-            //int limit = param.limit;
-            //int pageSize = -10;
-            //int pageNo = -10;
-
-            @Override
-            public void subscribe(@NonNull SingleEmitter<ArrayList<Headline>> e) throws Exception {
-                ArrayList<Headline> headlines = (ArrayList<Headline>) APICaller.getInstance()
-                        .loadHeadlines(DAOParam.fromCategory(param.category, param.offset, param.limit))
-                        .blockingGet();
-                for (Headline headline : headlines) {
-                    Log.i(TAG, "subscribe: " + headline);
-                    headline.isVisited = !newsDao.findByID(headline.news_ID)
-                            .blockingGet().isEmpty();
-                    Log.i(TAG, "update isVisited field");
-                    headlineDao.addHeadline(headline);
-                    Log.i(TAG, "insert into database");
-                }
-                /*
-                if (pageNo == pageSize)  {
-                    pageSize *= 2;
-                    pageNo /= 2;
-                }
-                pageNo += 1;
-                */
-                e.onSuccess(headlines);
-            }
-        }).doAfterSuccess(new Consumer<ArrayList<Headline>>() {
-            @Override
-            public void accept(ArrayList<Headline> headlines) throws Exception {
-                Log.i(TAG, "doAfterSuccess: "+headlines);
-                param.offset += param.limit;
-            }
-        });//.publish()
-                //.cache();
-        /*((getSettings().isOffline) //TODO: class RECOMMENDATION
-                ? headlineDao.load(classTags.get(param.category), param.offset, param.limit)
-                : APICaller.getInstance().loadHeadlines(param))*/
-    }
-
     public Single<ArrayList<Headline>> headlineObservable(final DAOParam param) {
         return Single.defer(new Callable<SingleSource<? extends ArrayList<Headline>>>() {
-            DAOParam daoParam = null;
+            public String keyword = null;
             @Override
             public SingleSource<? extends ArrayList<Headline>> call() throws Exception {
-                if (param.category == DAOParam.RECOMMENDATION) {
-                    if (daoParam == null) { //first setup
-                        daoParam = DAOParam.fromCategory(null, param.offset, param.limit);
+                if (param.category != null && param.category == DAOParam.RECOMMENDATION) {
+                    if (keyword == null) { //first setup
+                        Log.i(TAG, "first setup");
                         List<Keyword> keywords = keywordDao.getHighFreqWord().blockingGet();
-                        if (keywords.isEmpty()) daoParam.keywords = "国际";
+                        if (keywords.isEmpty()) keyword = "国际";
                         else {
-                            daoParam.keywords = "";
-                            for (Keyword keyword : keywords) {
-                                daoParam.keywords += keyword.word + " ";
+                            keyword = "";
+                            for (Keyword item : keywords) {
+                                keyword += item.word + " ";
                             }
                         }
-                        daoParam.category = null;
                     }
                     Log.i(TAG, "Thread: "+Thread.currentThread());
-                    Log.i(TAG, "best keywords: "+daoParam.keywords);
-                    return APICaller.getInstance().searchHeadlines(daoParam)
+                    Log.i(TAG, "best keywords: "+keyword);
+                    return APICaller.getInstance().searchHeadlines(DAOParam.fromKeyword(keyword, param.offset, param.limit))
                             .map(new Function<List<Headline>, ArrayList<Headline>>() {
                                 @Override
                                 public ArrayList<Headline> apply(@NonNull List<Headline> headlines) throws Exception {
+                                    Log.i(TAG, "apply: check if visited");
+                                    for (Headline headline : headlines)
+                                        headline.isVisited = !newsDao.findByID(headline.news_ID)
+                                                .blockingGet().isEmpty();
                                     return (ArrayList) headlines;
                                 }
                             });
@@ -199,6 +157,11 @@ public class DAO {
                     public void accept(ArrayList<Headline> headlines) throws Exception {
                         Log.i(TAG, "doAfterSuccess: " + headlines);
                         param.offset += param.limit;
+                        Log.i(TAG, "doAfterSuccess: " + param);
+                        Log.i(TAG, "doAfterSuccess insert into Headline Database begin");
+                        for (Headline headline : headlines)
+                            headlineDao.addHeadline(headline);
+                        Log.i(TAG, "doAfterSuccess insert into Headline Database done");
                     }
                 });
     }
@@ -221,9 +184,10 @@ public class DAO {
                     }
                 });
         final Single<News> fetchFromAPI = APICaller.getInstance().loadNews(param)
-                .map(new Function<News, News>() {
+                .doAfterSuccess(new Consumer<News>() {
                     @Override
-                    public News apply(@NonNull News news) throws Exception {
+                    public void accept(News news) throws Exception {
+                        Log.i(TAG, "fetchFrom API: doAfterSuccess begin"+news);
                         for (Keyword keyword:
                                 news.Keywords) { //adding keywords
                             List<Keyword> keywords = keywordDao.findKeywordByText(keyword.word).blockingGet();
@@ -231,7 +195,16 @@ public class DAO {
                             if (keywords.size() != 0) newKeyword.score += keywords.get(0).score;
                             keywordDao.addKeyword(newKeyword);
                         }
+                        newsDao.addNews(news); //add news into database
+                        Log.i(TAG, "fetchFrom API: doAfterSuccess done");
+                    }
+                })
+                .map(new Function<News, News>() {
+                    @Override
+                    public News apply(@NonNull News news) throws Exception {
+                        Log.i(TAG, "fetchFromAPI: begin");
                         sort(news.persons);
+                        news.news_HTMLContent = new String(news.news_Content);
                         for (News.Person person:
                                 news.persons) { //add baidu baidke link
                             String encoded = URLEncoder.encode(person.word, "UTF-8");
@@ -239,8 +212,7 @@ public class DAO {
                                     String.format("<a href=\"https://baike.baidu.com/item/%s\">%s</a>",
                                             encoded, person.word));
                         }
-                        Log.i(TAG, "fetchFromAPI: "+news);
-                        newsDao.addNews(news); //add news into database
+                        Log.i(TAG, "fetchFromAPI: done "+news);
                         return news;
 
                     }
@@ -277,6 +249,18 @@ public class DAO {
     @Deprecated
     public Single<ArrayList<Headline>> getHeadlineList(final DAOParam param)
     {
+        /*if (Math.PI > 0) return Single.create(new SingleOnSubscribe<ArrayList<Headline>>() {
+            @Override
+            public void subscribe(@NonNull SingleEmitter<ArrayList<Headline>> e) throws Exception {
+                ArrayList<Headline> headlines = new ArrayList<Headline>();
+                Headline headline = new Headline();
+                headline.news_Pictures = "http://www.people.com.cn/mediafile/pic/20150528/5/9571866183301822149.jpg";
+                headline.news_Title = "s";
+                headline.news_ID = "1";
+                headlines.add(headline);
+                e.onSuccess(headlines);
+            }
+        });*/
         Log.i(TAG, "getHeadlineList: "+param);
         Single<List<Headline>> fetch;
         if (param.keywords != null)
@@ -333,14 +317,14 @@ public class DAO {
         return fetch.map(new Function<List<Headline>, ArrayList<Headline>>() {// check if visited
                     @Override
                     public ArrayList<Headline> apply(@NonNull List<Headline> headlines) throws Exception {
-                        Log.i(TAG, "apply: getHeadlineList");
+                        Log.i(TAG, "apply: check if visited");
                         for (Headline headline : headlines)
                             headline.isVisited = !newsDao.findByID(headline.news_ID)
                                     .blockingGet().isEmpty();
                         return new ArrayList<>(headlines);
                     }
                 })
-                .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {// insert into Headline Database
+                /*.map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {// insert into Headline Database
                     @Override
                     public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines) throws Exception {
                         Log.i(TAG, "insert into Headline Database begin");
@@ -349,7 +333,7 @@ public class DAO {
                         Log.i(TAG, "insert into Headline Database done");
                         return headlines;
                     }
-                });
+                })*/;
     }
 
     /**
