@@ -21,7 +21,7 @@ public class Converters {
 
     @TypeConverter
     public static Long dateToTimestamp(Date date) {
-        return Calendar.getInstance().getTime().getTime();
+        return date == null ? null : Calendar.getInstance().getTime().getTime();
     }
 
     /*@TypeConverter
