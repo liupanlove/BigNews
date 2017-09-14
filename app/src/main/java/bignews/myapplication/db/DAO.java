@@ -204,6 +204,9 @@ public class DAO {
                     @Override
                     public News apply(@NonNull News news) throws Exception {
                         Log.i(TAG, "fetchFromAPI: begin");
+                        for (News.Person location:
+                                news.locations)
+                            news.persons.add(location);
                         sort(news.persons);
                         news.updated_time = Calendar.getInstance().getTime();
                         news.news_HTMLContent = new String(news.news_Content);
