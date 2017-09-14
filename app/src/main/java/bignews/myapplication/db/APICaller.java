@@ -82,7 +82,7 @@ public class APICaller {
                 })*/;
     }
 
-    Single<List<Headline>> searchHeadlines(DAOParam param) {
+    Single<List<Headline>> searchHeadlines(final DAOParam param) {
         return Tools.getRetrofit()
                 .create(APIService.class)
                 .loadHeadlines(1, param.limit + param.offset, param.category, param.keywords)
@@ -91,6 +91,7 @@ public class APICaller {
 
                     @Override
                     public List<Headline> apply(@NonNull HeadlineResponse headlineResponse) throws Exception {
+                        Log.i(TAG, "param: "+param);
                         Log.i(TAG, "apply: "+headlineResponse);
                         return headlineResponse.headlines;
                     }

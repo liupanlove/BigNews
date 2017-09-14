@@ -131,7 +131,7 @@ public class DAOTest {
 
     @Test
     public void getHeadlineList() throws Exception {
-        ArrayList<Headline> headlines = dao.getHeadlineList(DAOParam.fromCategory(1, 0, 10))
+        ArrayList<Headline> headlines = dao.headlineObservable(DAOParam.fromCategory(1, 0, 10))
                 .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {
                     @Override
                     public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines) throws Exception {
@@ -148,9 +148,9 @@ public class DAOTest {
         Log.i(TAG, "getHeadlineList: get All News="+dao.getNewsDao().getAll().blockingGet());
         Headline headline = dao.getHeadline(DAOParam.fromNewsId(headlines.get(0).news_ID)).blockingGet();
         Log.i(TAG, "getHeadlineList: headlinefirst="+headline);
-        assertEquals(headlines.get(0).isVisited, true);
+        assertEquals(headline.isVisited, true);
 
-        headlines = dao.getHeadlineList(DAOParam.fromKeyword("杭州 江苏", 0, 10))
+        headlines = dao.headlineObservable(DAOParam.fromKeyword("杭州 江苏", 0, 10))
                 .map(new Function<ArrayList<Headline>, ArrayList<Headline>>() {
                     @Override
                     public ArrayList<Headline> apply(@NonNull ArrayList<Headline> headlines) throws Exception {
