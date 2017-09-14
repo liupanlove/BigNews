@@ -101,6 +101,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         Log.i(TAG, news.get((int)id).news_ID);
         news.get(position - 1).isVisited = true;
         mCallback.onArticleSelected((news.get(position - 1).news_ID));  // Integer.parseInt
+        view.setBackgroundColor(getContext().getResources().getColor(R.color.colorBackgroundVisited));
     }
 
     @Override
@@ -158,7 +159,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
     public void onResume() {
         Log.i(TAG, "onResume: "+mText+" "+news.size());
         super.onResume();
-        adapter.notifyDataSetChanged();
+        //adapter.notifyDataSetChanged();
         if (news.size() == 0) {
             //listView.setRefreshing();
             loadNewsData();
