@@ -7,6 +7,7 @@ import android.util.Log;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -204,6 +205,7 @@ public class DAO {
                     public News apply(@NonNull News news) throws Exception {
                         Log.i(TAG, "fetchFromAPI: begin");
                         sort(news.persons);
+                        news.updated_time = Calendar.getInstance().getTime();
                         news.news_HTMLContent = new String(news.news_Content);
                         for (News.Person person:
                                 news.persons) { //add baidu baidke link
