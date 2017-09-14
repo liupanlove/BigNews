@@ -91,7 +91,7 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
     private SpeechSynthesizer mTts;
     private LinearLayout linearLayout1;
     private LinearLayout linearLayout2;
-    private String newNewsContent;
+    private String newsHTMLContent;
    // private SimpleDraweeView [] imageViews;
     //private TextView headline;
     private SingleObserver<? super News> subscriber = new SingleObserver<News>() {
@@ -120,14 +120,14 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             headline.setText(title);
             //newsContent += news.news_Content;
             //newsContent = newsContent.replaceAll("\\s*", "\\n");
-            Log.d(TAG, "害怕" + newsContent);
-            newNewsContent = newsContent.replaceAll("<.*?>", "");
-            Log.d(TAG, "害怕" + newNewsContent);
+            //Log.d(TAG, "害怕" + newsContent);
+            newsHTMLContent = news.news_HTMLContent;
+            //Log.d(TAG, "害怕" + newNewsContent);
             shareContent += ("标题：" + title + "\n" + "新闻详情：" + news.news_URL);
             /*Spannable textSpan = new SpannableStringBuilder(str);
             textSpan.setSpan(new AbsoluteSizeSpan(80), 0, headlineLength, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
             textSpan.setSpan(new AbsoluteSizeSpan(50), headlineLength, str.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);*/
-            article.setText(Html.fromHtml(newsContent));
+            article.setText(Html.fromHtml(newsHTMLContent));
             article.setMovementMethod(LinkMovementMethod.getInstance());
 
             //Log.d(TAG, "isFavourite" + isFavourite);
@@ -229,9 +229,6 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
         });
 
 
-        //tts.getMaxSpeechInputLength();
-        //Log.i(TAG, tts.getMaxSpeechInputLength() + "害怕");
-
         speaker.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -239,7 +236,7 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             {
                 //tts.speak(newsContent, TextToSpeech.QUEUE_ADD, null); //"1月1日，这是元旦节
                 //     "
-                mTts.startSpeaking(newNewsContent, null);
+                mTts.startSpeaking(newsContent, null);
             }
         });
     }
@@ -323,21 +320,10 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
         linearLayout1 = (LinearLayout) findViewById(R.id.articlelinearlayout);
         linearLayout2 = (LinearLayout) findViewById(R.id.articlelinearlayout1);
         weChatFriend = (ImageButton) view.findViewById(R.id.weChatFriend);
-        //weChatZone = (ImageButton) view.findViewById(R.id.weChatZone);
         qq = (ImageButton) view.findViewById(R.id.qq);
         weiBo = (ImageButton) view.findViewById(R.id.weiBo);
         cancel = (Button) view.findViewById(R.id.cancel);
         collect = (Button) view.findViewById(R.id.collect);
-        //toolBar = (Toolbar) findViewById(R.id.toolbar1);
-        /*imageViews = new SimpleDraweeView[8];
-        imageViews[0] = (SimpleDraweeView) findViewById(R.id.image1);
-        imageViews[1] = (SimpleDraweeView) findViewById(R.id.image2);
-        imageViews[2] = (SimpleDraweeView) findViewById(R.id.image3);
-        imageViews[3] = (SimpleDraweeView) findViewById(R.id.image4);
-        imageViews[4] = (SimpleDraweeView) findViewById(R.id.image5);
-        imageViews[5] = (SimpleDraweeView) findViewById(R.id.image6);
-        imageViews[6] = (SimpleDraweeView) findViewById(R.id.image7);
-        imageViews[7] = (SimpleDraweeView) findViewById(R.id.image8);*/
     }
     private void initData()
     {
@@ -356,24 +342,6 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
 
     private void ttsInit()
     {
-        /*tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if(status == TextToSpeech.SUCCESS)
-                {
-                    int result = tts.setLanguage(Locale.CHINESE);
-                    tts.setPitch(1.0f);
-                    tts.setSpeechRate(1.0f);
-                    if(result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE) {
-                        Toast.makeText(getApplicationContext(), "暂不支持", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else
-                {
-                    Toast.makeText(getApplicationContext(), "无法初始化", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });*/
         mTts.setParameter(SpeechConstant.SPEED, "50");
         mTts.setParameter(SpeechConstant.VOLUME, "80");
         mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);

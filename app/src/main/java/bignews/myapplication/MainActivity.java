@@ -66,7 +66,7 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (BaseActivity.config_struct.class_changed || BaseActivity.config_struct.favorite_changed) {
             BaseActivity.config_struct.class_changed = false;
