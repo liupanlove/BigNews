@@ -26,7 +26,8 @@ public class News extends Headline {
     public String toString() {
         return "News{" +
                 super.toString() +
-                //"news_Content=" + news_Content +
+                "news_HTMLContent=" + news_HTMLContent +
+                "news_Content=" + news_Content +
                 '}';
     }
     static class Person implements Comparable {

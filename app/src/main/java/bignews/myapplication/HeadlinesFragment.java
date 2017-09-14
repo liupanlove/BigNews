@@ -1,6 +1,7 @@
 package bignews.myapplication;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -23,6 +24,7 @@ import bignews.myapplication.db.DAOParam;
 import bignews.myapplication.db.Headline;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -103,8 +105,9 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
     @Override
     public void onCreate(@Nullable Bundle bundle) {
-        Log.i("Err", "onCreate: "+mText);
         super.onCreate(bundle);
+        adapter = new HeadlineAdapter(getActivity().getLayoutInflater(), news);
+        Log.i("Err", "onCreate: "+mText+" "+created+" "+news);
         if (created) return;
         created = true;
         if(getArguments()!=null){
@@ -118,8 +121,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
             else
                 headlineObservable = dao.headlineObservable(DAOParam.fromCategory(mID, 0, LIMIT));
         }
-        if (news.size() == 0)
-            loadNewsData();
+        Log.i("Err", "onCreate: "+mText);
     }
 
     @Nullable
@@ -128,13 +130,6 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
         Log.i(TAG, "onCreateView: "+mText);
         View view = inflater.inflate(R.layout.fragment_layout, container, false);
         ButterKnife.bind(this, view); //??? mogai
-        return view;
-    }
-
-    @Override
-    public void onResume() {
-        Log.i(TAG, "onResume: "+mText);
-        super.onResume();
 
         listView.setMode(PullToRefreshBase.Mode.PULL_FROM_END);
         // 下拉刷新
@@ -155,8 +150,19 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
 
         listView.setOnItemClickListener(this);
 
-        adapter = new HeadlineAdapter(getActivity().getLayoutInflater(), news);
         listView.setAdapter(adapter);
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        Log.i(TAG, "onResume: "+mText+" "+news.size());
+        super.onResume();
+        adapter.notifyDataSetChanged();
+        if (news.size() == 0) {
+            //listView.setRefreshing();
+            loadNewsData();
+        }
     }
 
     @Override
@@ -182,20 +188,24 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemCli
             }
         })*/
         //dao.getHeadlineList(param)
-        if (loading_data) return;
+        if (loading_data) {
+            Log.i(TAG, "loadNewsData: is refreshing "+mText);
+            return;
+        }
         loading_data = true;
+        Log.i(TAG, "loadNewsData: start new refresh "+mText);
         headlineObservable
                 .timeout(3, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(subscriber);
-        Log.i(TAG, "loadNewsData: "+news+" "+mText);
 
     }
     @Override
     public void onPause() {
         super.onPause();
         listView.onRefreshComplete();
+        loading_data = false;
         if (disposable != null) {
             Log.i(TAG, "onPause: " + mText + " Disposing.");
             disposable.dispose();

@@ -17,31 +17,42 @@ public class StartActivity extends Activity
 {
     private long delayTime = 1500;   // sleep 2s
     private boolean flag = false;
-    Timer timer;
-    TimerTask task;
+    //Timer timer;
+    //TimerTask task;
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.start);
 
-        timer = new Timer();
+        /*timer = new Timer();
         task = new TimerTask() {
             @Override
             public void run() {
                 openMainActivity();
             }
         };
-        timer.schedule(task, delayTime);
+        timer.schedule(task, delayTime);*/
+        final Handler handler = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                openMainActivity();
+            }
+        };
+        handler.postDelayed(runnable, delayTime); //持续时间为3秒
+
+
 
         TextView text = (TextView) findViewById(R.id.skip);      // skip
         text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openMainActivity();
-                timer.cancel();
+                handler.removeCallbacks(runnable);
             }
         });
     }
+
 
     private void openMainActivity()
     {
@@ -49,6 +60,7 @@ public class StartActivity extends Activity
         startActivity(intent);
         finish();
     }
+
     public boolean onkeyDown(int keyCode, KeyEvent event)      // 屏蔽后退键   有问题
     {
         if(keyCode == KeyEvent.KEYCODE_BACK) return true;

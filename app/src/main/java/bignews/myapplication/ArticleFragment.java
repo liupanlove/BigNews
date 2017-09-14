@@ -174,10 +174,9 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.article_view);
-
-        SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID +"=59b54aff");
-
+        Log.i(TAG, "mTts start");
         mTts = SpeechSynthesizer.createSynthesizer(ArticleFragment.this, null);
+        Log.i(TAG, "mTts end");
         article = (TextView) findViewById(R.id.article);
         //article.setMovementMethod(ScrollingMovementMethod.getInstance());
 
@@ -236,7 +235,9 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
             {
                 //tts.speak(newsContent, TextToSpeech.QUEUE_ADD, null); //"1月1日，这是元旦节
                 //     "
+                Log.i(TAG, "mTts startSpeaking");
                 mTts.startSpeaking(newsContent, null);
+                Log.i(TAG, "mTts startSpeaking end");
             }
         });
     }
