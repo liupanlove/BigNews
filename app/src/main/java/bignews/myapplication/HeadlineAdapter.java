@@ -24,6 +24,7 @@ import bignews.myapplication.db.Headline;
  */
 
 public class HeadlineAdapter extends BaseAdapter {
+    private static final String TAG = "BaseAdapter";
     List<Headline> headlines;
     LayoutInflater inflater;
 
@@ -50,6 +51,7 @@ public class HeadlineAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view_, ViewGroup viewGroup) {
+        Log.i(TAG, "getView: begin "+i);
         View view = null;
         view = inflater.inflate(R.layout.search_item, null);
         Headline u = headlines.get(i);
@@ -73,6 +75,7 @@ public class HeadlineAdapter extends BaseAdapter {
                 break;
             }
 
+        Log.i(TAG, "getView: mid "+i);
         if (!img.equals("") && BaseActivity.config_struct.picture_mode) {
             Uri uri = Uri.parse(img);
             Log.v("Err", i + "  " + img);
@@ -80,6 +83,7 @@ public class HeadlineAdapter extends BaseAdapter {
         } else {
             image.setVisibility(View.GONE);
         }
+        Log.i(TAG, "getView: end "+i);
         return view;
     }
 }
