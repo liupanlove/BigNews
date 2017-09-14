@@ -41,19 +41,23 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="0.2"
-        android:layout_gravity="center"
+        android:background="@color/white"
+        android:gravity="center"
         android:orientation="horizontal">
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:layout_weight="0.25"
             android:background="@drawable/java"/>
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:text="大新闻"
+            android:textSize="50dp"
             android:textColor="@color/colorPrimary"
+            android:gravity="center"
             android:layout_gravity="center"/>
     </LinearLayout>
 

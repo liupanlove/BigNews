@@ -6,7 +6,7 @@
         android:id = "@+id/search"
         android:orderInCategory="80"
         android:title = "搜索"
-        android:icon = "@drawable/search"
+        android:icon = "@drawable/search2"
         android:actionViewClass="android.widget.SearchView"
         app:showAsAction="collapseActionView|ifRoom"
         

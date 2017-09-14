@@ -149,6 +149,7 @@ public class ArticleFragment extends AppCompatActivity implements View.OnClickLi
                         image.setMinimumHeight(600);
                         image.setPadding(20, 20, 20, 20);
                         image.setImageURI(uri);
+
                         if(i == 0)
                         {
                             linearLayout2.addView(image);
